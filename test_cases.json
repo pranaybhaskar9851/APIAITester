@@ -1,0 +1,496 @@
+[
+  {
+    "id": "test001",
+    "test_name": "PUT /pet - Positive Test",
+    "method": "PUT",
+    "endpoint": "/pet",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "PUT /pet - Unauthorized Test",
+    "method": "PUT",
+    "endpoint": "/pet",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /pet - Positive Test",
+    "method": "POST",
+    "endpoint": "/pet",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /pet - Unauthorized Test",
+    "method": "POST",
+    "endpoint": "/pet",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "GET /pet/findByStatus - Positive Test",
+    "method": "GET",
+    "endpoint": "/pet/findByStatus?status=available",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "GET /pet/findByStatus - Unauthorized Test",
+    "method": "GET",
+    "endpoint": "/pet/findByStatus?status=available",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "GET /pet/findByTags - Positive Test",
+    "method": "GET",
+    "endpoint": "/pet/findByTags",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "GET /pet/findByTags - Unauthorized Test",
+    "method": "GET",
+    "endpoint": "/pet/findByTags",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test009",
+    "test_name": "GET /pet/{petId} - Positive Test",
+    "method": "GET",
+    "endpoint": "/pet/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test010",
+    "test_name": "GET /pet/{petId} - Unauthorized Test",
+    "method": "GET",
+    "endpoint": "/pet/1",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test011",
+    "test_name": "POST /pet/{petId} - Positive Test",
+    "method": "POST",
+    "endpoint": "/pet/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test012",
+    "test_name": "POST /pet/{petId} - Unauthorized Test",
+    "method": "POST",
+    "endpoint": "/pet/1",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test013",
+    "test_name": "DELETE /pet/{petId} - Positive Test",
+    "method": "DELETE",
+    "endpoint": "/pet/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test014",
+    "test_name": "DELETE /pet/{petId} - Unauthorized Test",
+    "method": "DELETE",
+    "endpoint": "/pet/1",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test015",
+    "test_name": "POST /pet/{petId}/uploadImage - Positive Test",
+    "method": "POST",
+    "endpoint": "/pet/1/uploadImage",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test016",
+    "test_name": "POST /pet/{petId}/uploadImage - Unauthorized Test",
+    "method": "POST",
+    "endpoint": "/pet/1/uploadImage",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test017",
+    "test_name": "GET /store/inventory - Positive Test",
+    "method": "GET",
+    "endpoint": "/store/inventory",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test018",
+    "test_name": "GET /store/inventory - Unauthorized Test",
+    "method": "GET",
+    "endpoint": "/store/inventory",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test019",
+    "test_name": "POST /store/order - Positive Test",
+    "method": "POST",
+    "endpoint": "/store/order",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test020",
+    "test_name": "POST /store/order - Unauthorized Test",
+    "method": "POST",
+    "endpoint": "/store/order",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test021",
+    "test_name": "GET /store/order/{orderId} - Positive Test",
+    "method": "GET",
+    "endpoint": "/store/order/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test022",
+    "test_name": "GET /store/order/{orderId} - Unauthorized Test",
+    "method": "GET",
+    "endpoint": "/store/order/1",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test023",
+    "test_name": "DELETE /store/order/{orderId} - Positive Test",
+    "method": "DELETE",
+    "endpoint": "/store/order/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test024",
+    "test_name": "DELETE /store/order/{orderId} - Unauthorized Test",
+    "method": "DELETE",
+    "endpoint": "/store/order/1",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test025",
+    "test_name": "POST /user - Positive Test",
+    "method": "POST",
+    "endpoint": "/user",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test026",
+    "test_name": "POST /user - Unauthorized Test",
+    "method": "POST",
+    "endpoint": "/user",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test027",
+    "test_name": "POST /user/createWithList - Positive Test",
+    "method": "POST",
+    "endpoint": "/user/createWithList",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test028",
+    "test_name": "POST /user/createWithList - Unauthorized Test",
+    "method": "POST",
+    "endpoint": "/user/createWithList",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test029",
+    "test_name": "GET /user/login - Positive Test",
+    "method": "GET",
+    "endpoint": "/user/login",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test030",
+    "test_name": "GET /user/login - Unauthorized Test",
+    "method": "GET",
+    "endpoint": "/user/login",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test031",
+    "test_name": "GET /user/logout - Positive Test",
+    "method": "GET",
+    "endpoint": "/user/logout",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test032",
+    "test_name": "GET /user/logout - Unauthorized Test",
+    "method": "GET",
+    "endpoint": "/user/logout",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test033",
+    "test_name": "GET /user/{username} - Positive Test",
+    "method": "GET",
+    "endpoint": "/user/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test034",
+    "test_name": "GET /user/{username} - Unauthorized Test",
+    "method": "GET",
+    "endpoint": "/user/1",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test035",
+    "test_name": "PUT /user/{username} - Positive Test",
+    "method": "PUT",
+    "endpoint": "/user/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test036",
+    "test_name": "PUT /user/{username} - Unauthorized Test",
+    "method": "PUT",
+    "endpoint": "/user/1",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test037",
+    "test_name": "DELETE /user/{username} - Positive Test",
+    "method": "DELETE",
+    "endpoint": "/user/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test038",
+    "test_name": "DELETE /user/{username} - Unauthorized Test",
+    "method": "DELETE",
+    "endpoint": "/user/1",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  }
+]
