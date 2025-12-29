@@ -5,9 +5,13 @@ import os
 from collections import defaultdict
 import re
 
-def generate_html_report(results, run_id):
-    os.makedirs("reports", exist_ok=True)
-    path = f"reports/report_{run_id}.html"
+def generate_html_report(results, path):
+    """Generate HTML report at the specified path"""
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    
+    # Extract run_id from path for display
+    run_id = os.path.basename(path).replace('report_', '').replace('.html', '')
 
     # Group results by endpoint
     endpoint_groups = defaultdict(list)
@@ -153,7 +157,14 @@ def generate_html_report(results, run_id):
             endpoint_stats=endpoint_stats
         ))
 
-def generate_junit(results, run_id):
+def generate_junit(results, path):
+    """Generate JUnit XML report at the specified path"""
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    
+    # Extract run_id from path for display
+    run_id = os.path.basename(path).replace('junit_', '').replace('.xml', '')
+    
     cases = []
     for r in results:
         tc = TestCase(r["name"])
@@ -164,5 +175,5 @@ def generate_junit(results, run_id):
             )
         cases.append(tc)
     suite = TestSuite(f"API-AI-Tester-{run_id}", cases)
-    with open(f"reports/junit_{run_id}.xml", "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8") as f:
         TestSuite.to_file(f, [suite])
