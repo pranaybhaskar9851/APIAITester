@@ -32,89 +32,89 @@ def main():
     args = parser.parse_args()
     
     print("=" * 80)
-    print("🚀 API AI Tester Pipeline Started")
+    print(">>> API AI Tester Pipeline Started")
     print("=" * 80)
-    print(f"📍 Base URL: {args.base_url}")
-    print(f"📄 Swagger URL: {args.swagger_url}")
-    print(f"🔑 API Key: {'***' if args.api_key else 'None'}")
-    print(f"🤖 Use AI: {args.use_ai}")
-    print(f"🧠 LLM Model: {args.llm_model}")
-    print(f"♻️  Reuse Tests: {args.reuse_tests}")
+    print(f"Base URL: {args.base_url}")
+    print(f"Swagger URL: {args.swagger_url}")
+    print(f"API Key: {'***' if args.api_key else 'None'}")
+    print(f"Use AI: {args.use_ai}")
+    print(f"LLM Model: {args.llm_model}")
+    print(f"Reuse Tests: {args.reuse_tests}")
     print("=" * 80)
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
     try:
         # Step 1: Load Swagger/OpenAPI specification
-        print("\n📥 Step 1: Loading API specification...")
+        print("\n[Step 1/5] Loading API specification...")
         swagger_doc = load_swagger(args.swagger_url)
-        print(f"✅ Loaded specification with {len(swagger_doc.get('paths', {}))} endpoints")
+        print(f"SUCCESS: Loaded specification with {len(swagger_doc.get('paths', {}))} endpoints")
         
         # Step 2: Generate or load test cases
         if args.reuse_tests and os.path.exists('test_cases.json'):
-            print("\n♻️  Step 2: Loading existing test cases...")
+            print("\n[Step 2/5] Loading existing test cases...")
             with open('test_cases.json', 'r') as f:
                 test_cases = json.load(f)
-            print(f"✅ Loaded {len(test_cases)} existing test cases")
+            print(f"SUCCESS: Loaded {len(test_cases)} existing test cases")
         else:
             if args.use_ai:
-                print(f"\n🤖 Step 2: Generating tests with AI (Model: {args.llm_model})...")
+                print(f"\n[Step 2/5] Generating tests with AI (Model: {args.llm_model})...")
                 test_cases = generate_tests_with_llm(swagger_doc, args.base_url, args.llm_model)
             else:
-                print("\n📝 Step 2: Generating tests with rule-based generator...")
+                print("\n[Step 2/5] Generating tests with rule-based generator...")
                 test_cases = generate_tests(swagger_doc, args.base_url)
             
-            print(f"✅ Generated {len(test_cases)} test cases")
+            print(f"SUCCESS: Generated {len(test_cases)} test cases")
             
             # Save test cases
             with open('test_cases.json', 'w') as f:
                 json.dump(test_cases, f, indent=2)
-            print("💾 Test cases saved to test_cases.json")
+            print("SUCCESS: Test cases saved to test_cases.json")
         
         # Step 3: Execute tests
-        print("\n🧪 Step 3: Executing API tests...")
+        print("\n[Step 3/5] Executing API tests...")
         results = execute_tests(test_cases, args.api_key, timestamp)
-        print(f"✅ Executed {len(results)} tests")
+        print(f"SUCCESS: Executed {len(results)} tests")
         
         # Step 4: Generate reports
-        print("\n📊 Step 4: Generating reports...")
+        print("\n[Step 4/5] Generating reports...")
         
         # HTML Report
         html_report_path = f"reports/report_{timestamp}.html"
         generate_html_report(results, html_report_path)
-        print(f"✅ HTML report: {html_report_path}")
+        print(f"SUCCESS: HTML report: {html_report_path}")
         
         # JUnit XML Report
         junit_report_path = f"reports/junit_{timestamp}.xml"
         generate_junit(results, junit_report_path)
-        print(f"✅ JUnit report: {junit_report_path}")
+        print(f"SUCCESS: JUnit report: {junit_report_path}")
         
         # Step 5: Print summary
         print("\n" + "=" * 80)
-        print("📈 Test Execution Summary")
+        print("[Step 5/5] Test Execution Summary")
         print("=" * 80)
         
         passed = sum(1 for r in results if r.get('status') == 'PASS')
         failed = sum(1 for r in results if r.get('status') == 'FAIL')
         skipped = sum(1 for r in results if r.get('status') == 'SKIP')
         
-        print(f"✅ Passed: {passed}")
-        print(f"❌ Failed: {failed}")
-        print(f"⏭️  Skipped: {skipped}")
-        print(f"📊 Total: {len(results)}")
-        print(f"📈 Success Rate: {(passed/len(results)*100):.1f}%")
+        print(f"PASSED: {passed}")
+        print(f"FAILED: {failed}")
+        print(f"SKIPPED: {skipped}")
+        print(f"TOTAL: {len(results)}")
+        print(f"Success Rate: {(passed/len(results)*100):.1f}%")
         print("=" * 80)
         
         # Exit with appropriate code
         if failed > 0:
-            print("\n⚠️  Some tests failed. Check reports for details.")
+            print("\nWARNING: Some tests failed. Check reports for details.")
             sys.exit(1)
         else:
-            print("\n✅ All tests passed!")
+            print("\nSUCCESS: All tests passed!")
             sys.exit(0)
             
     except Exception as e:
-        print(f"\n❌ Error: {str(e)}")
+        print(f"\nERROR: {str(e)}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
