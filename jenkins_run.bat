@@ -21,6 +21,14 @@ echo   Python Command: %PYTHON_CMD%
 echo.
 echo ============================================================================
 
+REM Clean Python cache to ensure fresh code execution
+echo.
+echo [0/5] Cleaning Python cache files...
+if exist __pycache__ rmdir /s /q __pycache__
+if exist engine\__pycache__ rmdir /s /q engine\__pycache__
+echo Python cache cleaned
+echo.
+
 REM Step 1: Setup Python Virtual Environment
 echo.
 echo [1/5] Setting up Python virtual environment...

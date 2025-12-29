@@ -1,8 +1,15 @@
 
 import requests, os, json
 import time
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
+
+# Configure stdout to handle encoding errors gracefully on Windows
+if sys.platform == 'win32' and hasattr(sys.stdout, 'buffer'):
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, errors='replace')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, errors='replace')
 
 # Thread-safe lock for file writing
 file_lock = Lock()
@@ -60,9 +67,14 @@ def execute_single_test(test, api_key, base_url, run_dir):
             "url": url
         }
         
-        # Print progress
-        status_emoji = "✅" if result["passed"] else "❌"
-        print(f"{status_emoji} {test['test_name']}: {r.status_code}")
+        # Print progress with safe encoding
+        status = "PASS" if result["passed"] else "FAIL"
+        try:
+            print(f"[{status}] {test['test_name']}: {r.status_code}")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            # Fallback for Windows console encoding issues
+            safe_name = test['test_name'].encode('ascii', errors='replace').decode('ascii')
+            print(f"[{status}] {safe_name}: {r.status_code}")
         
         return result
 
@@ -74,7 +86,13 @@ def execute_single_test(test, api_key, base_url, run_dir):
             "error": str(e),
             "url": url
         }
-        print(f"❌ {test['test_name']}: ERROR - {str(e)}")
+        # Print error with safe encoding
+        try:
+            print(f"[FAIL] {test['test_name']}: ERROR - {str(e)}")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            safe_name = test['test_name'].encode('ascii', errors='replace').decode('ascii')
+            safe_error = str(e).encode('ascii', errors='replace').decode('ascii')
+            print(f"[FAIL] {safe_name}: ERROR - {safe_error}")
         return result
 
 

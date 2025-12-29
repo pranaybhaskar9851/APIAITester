@@ -10,6 +10,12 @@ import sys
 import os
 from datetime import datetime
 
+# Configure stdout to handle encoding errors gracefully on Windows
+if sys.platform == 'win32' and hasattr(sys.stdout, 'buffer'):
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, errors='replace')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, errors='replace')
+
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 

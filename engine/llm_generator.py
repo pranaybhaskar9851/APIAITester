@@ -1,6 +1,13 @@
 
 import json
+import sys
 import ollama
+
+# Configure stdout to handle encoding errors gracefully on Windows
+if sys.platform == 'win32' and hasattr(sys.stdout, 'buffer'):
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, errors='replace')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, errors='replace')
 
 def generate_tests_with_llm(swagger: dict, login_endpoint=None, model="llama3.2"):
     """
