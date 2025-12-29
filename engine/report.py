@@ -5,13 +5,24 @@ import os
 from collections import defaultdict
 import re
 
-def generate_html_report(results, path):
+def generate_html_report(results, path, metadata=None):
     """Generate HTML report at the specified path"""
     # Ensure directory exists
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    dir_path = os.path.dirname(path)
+    if dir_path:  # Only create if there's a directory component
+        os.makedirs(dir_path, exist_ok=True)
     
     # Extract run_id from path for display
     run_id = os.path.basename(path).replace('report_', '').replace('.html', '')
+    
+    # Extract metadata if provided
+    if metadata is None:
+        metadata = {}
+    timings = metadata.get('timings', {})
+    generation_method = metadata.get('generation_method', 'Unknown')
+    llm_model = metadata.get('llm_model')
+    base_url = metadata.get('base_url', 'N/A')
+    total_tests_generated = metadata.get('total_tests', len(results))
 
     # Group results by endpoint
     endpoint_groups = defaultdict(list)
@@ -52,6 +63,23 @@ def generate_html_report(results, path):
             body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
             .container { max-width: 1400px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
             h1 { color: #333; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+            h2 { color: #333; margin-top: 40px; border-left: 4px solid #667eea; padding-left: 15px; }
+            
+            .execution-info { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
+            .execution-info h3 { margin-top: 0; color: #667eea; }
+            .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px; }
+            .info-item { padding: 10px; background: white; border-radius: 4px; border: 1px solid #e0e0e0; }
+            .info-item label { font-weight: 600; color: #666; font-size: 12px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+            .info-item value { color: #333; font-size: 16px; display: block; }
+            
+            .timing-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 8px; margin: 30px 0; }
+            .timing-section h3 { margin: 0 0 20px 0; font-size: 20px; }
+            .timing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+            .timing-card { background: rgba(255,255,255,0.15); padding: 15px; border-radius: 6px; backdrop-filter: blur(10px); }
+            .timing-card label { font-size: 12px; opacity: 0.9; display: block; margin-bottom: 8px; }
+            .timing-card .time { font-size: 28px; font-weight: bold; }
+            .timing-card .unit { font-size: 14px; opacity: 0.8; margin-left: 4px; }
+            
             .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 30px 0; }
             .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
             .stat-card h3 { margin: 0; font-size: 14px; opacity: 0.9; }
@@ -82,8 +110,67 @@ def generate_html_report(results, path):
     </head>
     <body>
         <div class="container">
-            <h1>🚀 API AI Tester Report - {{run_id}}</h1>
+            <h1>API AI Tester Report - {{run_id}}</h1>
             
+            {% if timings %}
+            <div class="timing-section">
+                <h3>Execution Timeline</h3>
+                <div class="timing-grid">
+                    {% if timings.swagger_load > 0 %}
+                    <div class="timing-card">
+                        <label>SWAGGER SPEC LOAD</label>
+                        <div class="time">{{\"%.2f\"|format(timings.swagger_load)}}<span class="unit">sec</span></div>
+                    </div>
+                    {% endif %}
+                    {% if timings.test_generation > 0 %}
+                    <div class="timing-card">
+                        <label>TEST GENERATION</label>
+                        <div class="time">{{\"%.2f\"|format(timings.test_generation)}}<span class="unit">sec</span></div>
+                    </div>
+                    {% endif %}
+                    <div class="timing-card">
+                        <label>TEST EXECUTION</label>
+                        <div class="time">{{\"%.2f\"|format(timings.test_execution)}}<span class="unit">sec</span></div>
+                    </div>
+                    {% if timings.report_generation %}
+                    <div class="timing-card">
+                        <label>REPORT GENERATION</label>
+                        <div class="time">{{\"%.2f\"|format(timings.report_generation)}}<span class="unit">sec</span></div>
+                    </div>
+                    {% endif %}
+                    <div class="timing-card" style="background: rgba(255,255,255,0.25);">
+                        <label>TOTAL TIME</label>
+                        <div class="time">{{\"%.2f\"|format(timings.total_execution)}}<span class="unit">sec</span></div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="execution-info">
+                <h3>Execution Details</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Test Generation Method</label>
+                        <value>{{generation_method}}</value>
+                    </div>
+                    {% if llm_model %}
+                    <div class="info-item">
+                        <label>LLM Model Used</label>
+                        <value>{{llm_model}}</value>
+                    </div>
+                    {% endif %}
+                    <div class="info-item">
+                        <label>Base URL</label>
+                        <value>{{base_url}}</value>
+                    </div>
+                    <div class="info-item">
+                        <label>Tests Generated</label>
+                        <value>{{total_tests_generated}}</value>
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Test Results Summary</h2>
             <div class="summary">
                 <div class="stat-card endpoints">
                     <h3>ENDPOINTS TESTED</h3>
@@ -154,13 +241,20 @@ def generate_html_report(results, path):
             total_tests=total_tests,
             total_passed=total_passed,
             total_failed=total_failed,
-            endpoint_stats=endpoint_stats
+            endpoint_stats=endpoint_stats,
+            timings=timings,
+            generation_method=generation_method,
+            llm_model=llm_model,
+            base_url=base_url,
+            total_tests_generated=total_tests_generated
         ))
 
 def generate_junit(results, path):
     """Generate JUnit XML report at the specified path"""
     # Ensure directory exists
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    dir_path = os.path.dirname(path)
+    if dir_path:  # Only create if there's a directory component
+        os.makedirs(dir_path, exist_ok=True)
     
     # Extract run_id from path for display
     run_id = os.path.basename(path).replace('junit_', '').replace('.xml', '')

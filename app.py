@@ -573,15 +573,17 @@ def home():
                         <div class="form-group">
                             <label>LLM Model <span class="label-help">(select a lightweight model)</span></label>
                             <select name="llm_model" style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; transition: all 0.3s; background: white; cursor: pointer;">
-                                <option value="llama3.2:1b">🦙 Llama 3.2 1B (Fastest - 1.3GB)</option>
-                                <option value="llama3.2" selected>🦙 Llama 3.2 3B (Balanced - 2GB)</option>
                                 <option value="qwen2.5:0.5b">🐉 Qwen 2.5 0.5B (Ultra-light - 400MB)</option>
+                                <option value="tinyllama:latest">🦙 TinyLlama Latest (Ultra-light - 637MB)</option>
+                                <option value="llama3.2:1b" selected>🦙 Llama 3.2 1B (Fastest - 1.3GB)</option>
+                                <option value="gemma3:1b">💎 Gemma 3 1B (Compact - 1GB)</option>
+                                <option value="llama3:8b">🦙 Llama 3 8B (Powerful - 4.7GB)</option>
                                 <option value="phi3:mini">🔬 Phi 3 Mini (Efficient - 2.3GB)</option>
                             </select>
                         </div>
                         
                         <div class="info-box" style="background: #fff3e0; border-left-color: #ff9800; color: #e65100;">
-                            💡 <strong>Model Info:</strong> Smaller models are faster but may generate fewer variations. Install with: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">ollama pull [model]</code>
+                            💡 <strong>Tip:</strong> First run generates and saves tests. Next runs can reuse them for faster execution. Install models with: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">ollama pull [model]</code>
                         </div>
                         
                         <div class="checkbox-group">
@@ -616,6 +618,11 @@ async def run(
 ):
     import os
     import json
+    import time
+    
+    # Track execution timing
+    execution_start = time.time()
+    timings = {}
     
     tests_file = "test_cases.json"
     
@@ -624,17 +631,26 @@ async def run(
         print(f"Reusing existing test cases from {tests_file}")
         with open(tests_file, "r") as f:
             tests = json.load(f)
+        timings['test_generation'] = 0
+        timings['swagger_load'] = 0
+        generation_method = "Reused Existing Tests"
     else:
-        # Generate new tests from Swagger
+        # Step 1: Load Swagger specification
+        step_start = time.time()
         spec = load_swagger(swagger)
+        timings['swagger_load'] = time.time() - step_start
         
-        # Choose generation method based on user preference
+        # Step 2: Generate tests
+        step_start = time.time()
         if use_llm == "true":
             print(f"Using LLM-based test generation with model: {llm_model}")
             tests = generate_tests_with_llm(spec, None, llm_model)
+            generation_method = f"LLM-based ({llm_model})"
         else:
             print("Using Swagger-based test generation")
             tests = generate_tests(spec, None)
+            generation_method = "Rule-based (Swagger)"
+        timings['test_generation'] = time.time() - step_start
         
         # Save generated tests for future reuse
         with open(tests_file, "w") as f:
@@ -643,11 +659,29 @@ async def run(
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # Execute tests with API key
+    # Step 3: Execute tests
+    step_start = time.time()
     results = execute_tests(tests, api_key, base_url, run_id)
-
-    generate_html_report(results, run_id)
-    generate_junit(results, run_id)
+    timings['test_execution'] = time.time() - step_start
+    
+    # Step 4: Generate reports
+    step_start = time.time()
+    html_path = os.path.join("reports", f"report_{run_id}.html")
+    junit_path = os.path.join("reports", f"junit_{run_id}.xml")
+    
+    # Pass timing and metadata to report generation
+    timings['total_execution'] = time.time() - execution_start
+    metadata = {
+        'timings': timings,
+        'generation_method': generation_method,
+        'llm_model': llm_model if use_llm == "true" else None,
+        'base_url': base_url,
+        'total_tests': len(tests)
+    }
+    
+    generate_html_report(results, html_path, metadata)
+    generate_junit(results, junit_path)
+    timings['report_generation'] = time.time() - step_start
 
     return {
         "status": "success",

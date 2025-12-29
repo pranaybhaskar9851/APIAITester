@@ -37,6 +37,9 @@ def main():
     
     args = parser.parse_args()
     
+    # Start overall timer
+    pipeline_start_time = datetime.now()
+    
     print("=" * 80)
     print(">>> API AI Tester Pipeline Started")
     print("=" * 80)
@@ -50,27 +53,38 @@ def main():
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
+    # Track execution timings
+    timings = {}
+    
     try:
         # Step 1: Load Swagger/OpenAPI specification
+        step_start = datetime.now()
         print("\n[Step 1/5] Loading API specification...")
         swagger_doc = load_swagger(args.swagger_url)
-        print(f"SUCCESS: Loaded specification with {len(swagger_doc.get('paths', {}))} endpoints")
+        timings['swagger_load'] = (datetime.now() - step_start).total_seconds()
+        print(f"SUCCESS: Loaded specification with {len(swagger_doc.get('paths', {}))} endpoints (took {timings['swagger_load']:.1f}s)")
         
         # Step 2: Generate or load test cases
+        step_start = datetime.now()
         if args.reuse_tests and os.path.exists('test_cases.json'):
             print("\n[Step 2/5] Loading existing test cases...")
             with open('test_cases.json', 'r') as f:
                 test_cases = json.load(f)
-            print(f"SUCCESS: Loaded {len(test_cases)} existing test cases")
+            timings['test_generation'] = (datetime.now() - step_start).total_seconds()
+            generation_method = "Reused Existing Tests"
+            print(f"SUCCESS: Loaded {len(test_cases)} existing test cases (took {timings['test_generation']:.1f}s)")
         else:
             if args.use_ai:
                 print(f"\n[Step 2/5] Generating tests with AI (Model: {args.llm_model})...")
                 test_cases = generate_tests_with_llm(swagger_doc, args.base_url, args.llm_model)
+                generation_method = f"LLM-based ({args.llm_model})"
             else:
                 print("\n[Step 2/5] Generating tests with rule-based generator...")
                 test_cases = generate_tests(swagger_doc, args.base_url)
+                generation_method = "Rule-based (Swagger)"
             
-            print(f"SUCCESS: Generated {len(test_cases)} test cases")
+            timings['test_generation'] = (datetime.now() - step_start).total_seconds()
+            print(f"SUCCESS: Generated {len(test_cases)} test cases (took {timings['test_generation']:.1f}s)")
             
             # Save test cases
             with open('test_cases.json', 'w') as f:
@@ -78,22 +92,40 @@ def main():
             print("SUCCESS: Test cases saved to test_cases.json")
         
         # Step 3: Execute tests
+        step_start = datetime.now()
         print("\n[Step 3/5] Executing API tests...")
         results = execute_tests(test_cases, args.api_key, args.base_url, timestamp)
-        print(f"SUCCESS: Executed {len(results)} tests")
+        timings['test_execution'] = (datetime.now() - step_start).total_seconds()
+        print(f"SUCCESS: Executed {len(results)} tests (took {timings['test_execution']:.1f}s)")
         
         # Step 4: Generate reports
+        step_start = datetime.now()
         print("\n[Step 4/5] Generating reports...")
+        
+        # Calculate total pipeline time
+        timings['total_execution'] = (datetime.now() - pipeline_start_time).total_seconds()
+        
+        # Prepare metadata for reports
+        metadata = {
+            'timings': timings,
+            'generation_method': generation_method,
+            'llm_model': args.llm_model if args.use_ai else None,
+            'base_url': args.base_url,
+            'total_tests': len(test_cases)
+        }
         
         # HTML Report
         html_report_path = f"reports/report_{timestamp}.html"
-        generate_html_report(results, html_report_path)
+        generate_html_report(results, html_report_path, metadata)
         print(f"SUCCESS: HTML report: {html_report_path}")
         
         # JUnit XML Report
         junit_report_path = f"reports/junit_{timestamp}.xml"
         generate_junit(results, junit_report_path)
         print(f"SUCCESS: JUnit report: {junit_report_path}")
+        
+        timings['report_generation'] = (datetime.now() - step_start).total_seconds()
+        print(f"Report generation took {timings['report_generation']:.1f}s")
         
         # Step 5: Print summary
         print("\n" + "=" * 80)
@@ -109,6 +141,9 @@ def main():
         print(f"SKIPPED: {skipped}")
         print(f"TOTAL: {len(results)}")
         print(f"Success Rate: {(passed/len(results)*100):.1f}%")
+        print("=" * 80)
+        print(f"TOTAL EXECUTION TIME: {timings['total_execution']:.1f} seconds")
+        print("=" * 80)
         print("=" * 80)
         
         # Exit with appropriate code
