@@ -73,7 +73,7 @@ def main():
         
         # Step 3: Execute tests
         print("\n[Step 3/5] Executing API tests...")
-        results = execute_tests(test_cases, args.api_key, timestamp)
+        results = execute_tests(test_cases, args.api_key, args.base_url, timestamp)
         print(f"SUCCESS: Executed {len(results)} tests")
         
         # Step 4: Generate reports
