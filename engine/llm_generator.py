@@ -22,25 +22,25 @@ def generate_tests_with_llm(swagger: dict, login_endpoint=None, model="llama3.2"
             if method.lower() in ["get", "post", "put", "delete", "patch"]:
                 expected_test_count += 2  # positive + unauthorized
     
-    print(f"\n🤖 Using LLM ({model}) to generate tests for {len(paths)} endpoints...")
-    print(f"⏱️  Expected ~{expected_test_count} test cases")
-    print("⚡ Processing all endpoints in a single batch for faster execution\n")
+    print(f"\n[LLM] Using {model} to generate tests for {len(paths)} endpoints...")
+    print(f"Expected ~{expected_test_count} test cases")
+    print("Processing all endpoints in a single batch for faster execution\n")
     
     # Process all endpoints at once for faster execution
     all_tests, test_counter = generate_batch_with_llm(paths, swagger.get("info", {}), login_path, model, 1, 1, test_counter)
     
     # Check if LLM generated significantly fewer tests than expected
     if all_tests and len(all_tests) < expected_test_count * 0.8:  # Less than 80% of expected
-        print(f"\n⚠️  LLM generated only {len(all_tests)}/{expected_test_count} expected tests")
-        print("🔄 Falling back to rule-based generation to ensure complete coverage\n")
+        print(f"\nWARNING: LLM generated only {len(all_tests)}/{expected_test_count} expected tests")
+        print("Falling back to rule-based generation to ensure complete coverage\n")
         return generate_basic_tests_fallback(swagger, login_endpoint)
     
     # If LLM completely failed, fall back to basic generation
     if not all_tests:
-        print("⚠️  LLM generation produced no valid tests. Using fallback generation...")
+        print("WARNING: LLM generation produced no valid tests. Using fallback generation...")
         return generate_basic_tests_fallback(swagger, login_endpoint)
     
-    print(f"✅ LLM generated {len(all_tests)} test cases successfully")
+    print(f"SUCCESS: LLM generated {len(all_tests)} test cases successfully")
     return all_tests
 
 
@@ -70,7 +70,7 @@ Rules:
 Your JSON array:"""
 
     try:
-        print(f"  📡 Processing {len(paths_batch)} endpoints (batch {batch_num}/{total_batches})...")
+        print(f"  Processing {len(paths_batch)} endpoints (batch {batch_num}/{total_batches})...")
         
         # Call Ollama API with optimized parameters
         response = ollama.chat(
@@ -127,24 +127,24 @@ Your JSON array:"""
                 validated_tests.append(validated_test)
                 test_counter += 1
             else:
-                print(f"    ⚠️  Skipping invalid test: missing required fields {[k for k in ['method', 'endpoint', 'expected_status'] if k not in test]}")
+                print(f"    WARNING: Skipping invalid test: missing required fields {[k for k in ['method', 'endpoint', 'expected_status'] if k not in test]}")
         
         if validated_tests:
-            print(f"  ✅ Batch {batch_num} generated {len(validated_tests)} test cases")
+            print(f"  SUCCESS: Batch {batch_num} generated {len(validated_tests)} test cases")
         else:
-            print(f"  ⚠️  Batch {batch_num} generated 0 valid test cases")
+            print(f"  WARNING: Batch {batch_num} generated 0 valid test cases")
         
         return validated_tests, test_counter
         
     except json.JSONDecodeError as e:
-        print(f"  ❌ Batch {batch_num} JSON parse error: {e}")
-        print(f"  📄 LLM Output preview: {llm_output[:500] if 'llm_output' in locals() else 'N/A'}...")
-        print(f"  💡 Tip: The LLM might be generating invalid JSON. Consider using rule-based generation instead.")
+        print(f"  ERROR: Batch {batch_num} JSON parse error: {e}")
+        print(f"  LLM Output preview: {llm_output[:500] if 'llm_output' in locals() else 'N/A'}...")
+        print(f"  TIP: The LLM might be generating invalid JSON. Consider using rule-based generation instead.")
         return [], test_counter
         
     except Exception as e:
-        print(f"  ❌ Batch {batch_num} error: {type(e).__name__}: {e}")
-        print(f"  💡 Tip: Check if Ollama is running and the model '{model}' is available")
+        print(f"  ERROR: Batch {batch_num} error: {type(e).__name__}: {e}")
+        print(f"  TIP: Check if Ollama is running and the model '{model}' is available")
         return [], test_counter
 
 

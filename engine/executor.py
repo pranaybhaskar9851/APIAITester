@@ -94,7 +94,7 @@ def execute_tests(tests, api_key, base_url, run_id, max_workers=10):
         print(f"Using API key: {api_key[:10] if len(api_key) > 10 else api_key}...")
 
     # Execute all test cases in parallel
-    print(f"\n🚀 Executing {len(tests)} test cases in parallel (max {max_workers} concurrent)...\n")
+    print(f"\n[EXECUTOR] Running {len(tests)} test cases in parallel (max {max_workers} concurrent)...\n")
     
     start_time = time.time()
     
@@ -112,7 +112,7 @@ def execute_tests(tests, api_key, base_url, run_id, max_workers=10):
                 results.append(result)
             except Exception as e:
                 test = future_to_test[future]
-                print(f"❌ {test['test_name']}: EXCEPTION - {str(e)}")
+                print(f"ERROR: {test['test_name']}: EXCEPTION - {str(e)}")
                 results.append({
                     "id": test["id"],
                     "name": test["test_name"],
@@ -126,8 +126,8 @@ def execute_tests(tests, api_key, base_url, run_id, max_workers=10):
     failed_count = len(results) - passed_count
     
     print(f"\n{'='*60}")
-    print(f"✨ Execution completed in {elapsed_time:.2f} seconds")
-    print(f"📊 Results: {passed_count} passed, {failed_count} failed out of {len(results)} tests")
+    print(f"Execution completed in {elapsed_time:.2f} seconds")
+    print(f"Results: {passed_count} passed, {failed_count} failed out of {len(results)} tests")
     print(f"{'='*60}\n")
 
     return results
