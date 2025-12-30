@@ -619,52 +619,69 @@ async def run(
     import os
     import json
     import time
+    import sys
     
     # Track execution timing
     execution_start = time.time()
     timings = {}
     
+    print("\n" + "="*70, flush=True)
+    print("API TEST EXECUTION PIPELINE STARTED", flush=True)
+    print("="*70, flush=True)
+    
     tests_file = "test_cases.json"
     
     # Check if user wants to reuse existing tests
     if reuse_tests == "true" and os.path.exists(tests_file):
-        print(f"Reusing existing test cases from {tests_file}")
+        print(f"\n[STEP 1/4] Reusing existing test cases from {tests_file}", flush=True)
         with open(tests_file, "r") as f:
             tests = json.load(f)
+        print(f"✓ Loaded {len(tests)} test cases from file", flush=True)
         timings['test_generation'] = 0
         timings['swagger_load'] = 0
         generation_method = "Reused Existing Tests"
     else:
         # Step 1: Load Swagger specification
+        print(f"\n[STEP 1/4] Loading Swagger specification...", flush=True)
+        print(f"  Source: {swagger}", flush=True)
         step_start = time.time()
         spec = load_swagger(swagger)
         timings['swagger_load'] = time.time() - step_start
+        print(f"✓ Swagger loaded successfully ({timings['swagger_load']:.2f}s)", flush=True)
+        print(f"  Found {len(spec.get('paths', {}))} endpoints", flush=True)
         
         # Step 2: Generate tests
+        print(f"\n[STEP 2/4] Generating test cases...", flush=True)
         step_start = time.time()
         if use_llm == "true":
-            print(f"Using LLM-based test generation with model: {llm_model}")
+            print(f"  Method: LLM-based generation", flush=True)
+            print(f"  Model: {llm_model}", flush=True)
             tests = generate_tests_with_llm(spec, None, llm_model)
             generation_method = f"LLM-based ({llm_model})"
         else:
-            print("Using Swagger-based test generation")
+            print(f"  Method: Rule-based generation", flush=True)
             tests = generate_tests(spec, None)
             generation_method = "Rule-based (Swagger)"
         timings['test_generation'] = time.time() - step_start
+        print(f"✓ Generated {len(tests)} test cases ({timings['test_generation']:.2f}s)", flush=True)
         
         # Save generated tests for future reuse
         with open(tests_file, "w") as f:
             json.dump(tests, f, indent=2)
-        print(f"Generated {len(tests)} test cases and saved to {tests_file}")
+        print(f"  Saved to: {tests_file}", flush=True)
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     
     # Step 3: Execute tests
+    print(f"\n[STEP 3/4] Executing {len(tests)} test cases...", flush=True)
+    print(f"  Base URL: {base_url}", flush=True)
+    print(f"  Run ID: {run_id}", flush=True)
     step_start = time.time()
     results = execute_tests(tests, api_key, base_url, run_id)
     timings['test_execution'] = time.time() - step_start
     
     # Step 4: Generate reports
+    print(f"\n[STEP 4/4] Generating reports...", flush=True)
     step_start = time.time()
     html_path = os.path.join("reports", f"report_{run_id}.html")
     junit_path = os.path.join("reports", f"junit_{run_id}.xml")
@@ -682,6 +699,20 @@ async def run(
     generate_html_report(results, html_path, metadata)
     generate_junit(results, junit_path)
     timings['report_generation'] = time.time() - step_start
+    
+    print(f"✓ Reports generated ({timings['report_generation']:.2f}s)", flush=True)
+    print(f"  HTML Report: {html_path}", flush=True)
+    print(f"  JUnit Report: {junit_path}", flush=True)
+    
+    print(f"\n{'='*70}", flush=True)
+    print(f"PIPELINE COMPLETED SUCCESSFULLY", flush=True)
+    print(f"{'='*70}", flush=True)
+    print(f"Total Execution Time: {timings['total_execution']:.2f}s", flush=True)
+    print(f"  • Swagger Load: {timings['swagger_load']:.2f}s", flush=True)
+    print(f"  • Test Generation: {timings['test_generation']:.2f}s", flush=True)
+    print(f"  • Test Execution: {timings['test_execution']:.2f}s", flush=True)
+    print(f"  • Report Generation: {timings['report_generation']:.2f}s", flush=True)
+    print(f"{'='*70}\n", flush=True)
 
     return {
         "status": "success",

@@ -1,3 +1,4 @@
+from engine.swagger import get_request_body_schema, generate_sample_data
 
 def generate_tests(swagger: dict, login_endpoint=None):
     tests = []
@@ -64,34 +65,88 @@ def generate_tests(swagger: dict, login_endpoint=None):
             if query_params:
                 endpoint += "?" + "&".join(query_params)
 
-            tests.append({
+            # Generate request body for POST/PUT/PATCH methods
+            request_body = None
+            if method.lower() in ['post', 'put', 'patch']:
+                schema = get_request_body_schema(swagger, path, method)
+                if schema:
+                    request_body = generate_sample_data(swagger, schema)
+
+            # Create positive test
+            expected_status = 201 if method.lower() == 'post' else 200
+            test_case = {
                 "id": f"test{test_counter:03d}",
-                "test_name": f"{method.upper()} {path} - Positive Test",
+                "test_name": f"{method.upper()} {path} - Valid Request",
                 "method": method.upper(),
                 "endpoint": endpoint,
-                "expected_status": 200,
+                "expected_status": expected_status,
                 "auth": "valid",
                 "headers": {
                     "accept": "application/json",
                     "Content-Type": "application/json",
                     "Locale": "en_US"
                 }
-            })
+            }
+            if request_body:
+                test_case["body"] = request_body
+            
+            tests.append(test_case)
             test_counter += 1
 
-            tests.append({
-                "id": f"test{test_counter:03d}",
-                "test_name": f"{method.upper()} {path} - Unauthorized Test",
-                "method": method.upper(),
-                "endpoint": endpoint,
-                "expected_status": 401,
-                "auth": "invalid",
-                "headers": {
-                    "accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Locale": "en_US"
+            # Create negative test based on method type
+            if method.lower() == 'get':
+                # For GET: test unauthorized access
+                negative_test = {
+                    "id": f"test{test_counter:03d}",
+                    "test_name": f"{method.upper()} {path} - Unauthorized",
+                    "method": method.upper(),
+                    "endpoint": endpoint,
+                    "expected_status": 401,
+                    "auth": "invalid",
+                    "headers": {
+                        "accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Locale": "en_US"
+                    }
                 }
-            })
+            else:
+                # For POST/PUT/DELETE/PATCH: test with invalid/non-existent resource
+                invalid_endpoint = endpoint
+                # Replace path parameters with non-existent IDs
+                if "{" in path:
+                    # Use 999999 for non-existent resource
+                    invalid_endpoint = endpoint.replace("/1", "/999999")
+                else:
+                    # For endpoints without params, use invalid data in body
+                    invalid_endpoint = endpoint
+                
+                negative_test = {
+                    "id": f"test{test_counter:03d}",
+                    "test_name": f"{method.upper()} {path} - Invalid Input",
+                    "method": method.upper(),
+                    "endpoint": invalid_endpoint,
+                    "expected_status": 404 if method.lower() in ['put', 'delete'] else 400,
+                    "auth": "valid",
+                    "headers": {
+                        "accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Locale": "en_US"
+                    }
+                }
+                
+                # Add invalid body for POST/PUT/PATCH
+                if request_body and method.lower() in ['post', 'put', 'patch']:
+                    import random
+                    invalid_body = request_body.copy() if isinstance(request_body, dict) else request_body
+                    # Make the body invalid by setting required fields to invalid values
+                    if isinstance(invalid_body, dict):
+                        if 'id' in invalid_body:
+                            invalid_body['id'] = random.randint(100000, 9999999)  # Random non-existent ID
+                        if 'name' in invalid_body:
+                            invalid_body['name'] = ""  # Empty name (often invalid)
+                    negative_test["body"] = invalid_body
+            
+            tests.append(negative_test)
             test_counter += 1
 
     return tests

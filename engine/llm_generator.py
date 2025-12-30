@@ -3,12 +3,53 @@ import json
 import sys
 import ollama
 import time
+import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
+from engine.swagger import get_request_body_schema, generate_sample_data
 
 # Configure stdout to handle encoding errors gracefully on Windows
 if sys.platform == 'win32' and hasattr(sys.stdout, 'buffer'):
     import codecs
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, errors='replace')
     sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, errors='replace')
+
+def fix_json_format(json_str):
+    """
+    Fix common JSON formatting issues from LLM output.
+    Converts JavaScript-style syntax to valid JSON.
+    """
+    # Remove template literals and replace with empty strings or actual values
+    json_str = re.sub(r'`([^`]*)`', r'"\1"', json_str)  # Replace backticks with double quotes
+    
+    # Fix template variable references like ${endpoint}
+    json_str = re.sub(r'\$\{[^}]+\}', '""', json_str)
+    
+    # Fix unquoted property names (JavaScript style) - must come before value fixes
+    # Match word characters followed by colon (not already quoted)
+    json_str = re.sub(r'([,{]\s*)(\w+)(\s*:)', r'\1"\2"\3', json_str)
+    
+    # Fix unquoted single word values - more aggressive matching
+    # Match standalone words on their own line or after colon
+    json_str = re.sub(r':\s+(\w+)\s*,', r': "\1",', json_str)  # : word,
+    json_str = re.sub(r':\s+(\w+)\s*\n', r': "\1"\n', json_str)  # : word\n
+    json_str = re.sub(r':\s*(\w+)\s*([,}])', r': "\1"\2', json_str)  # Catch remaining
+    
+    # Fix boolean and null values that were incorrectly quoted
+    json_str = json_str.replace('"true"', 'true')
+    json_str = json_str.replace('"false"', 'false')
+    json_str = json_str.replace('"null"', 'null')
+    
+    # Fix numbers that were incorrectly quoted (but keep string numbers)
+    json_str = re.sub(r': "(\d+)"([,}\]])', r': \1\2', json_str)
+    
+    # Replace single quotes with double quotes
+    json_str = json_str.replace("'", '"')
+    
+    # Remove trailing commas before closing brackets/braces
+    json_str = re.sub(r',\s*([}\]])', r'\1', json_str)
+    
+    return json_str
 
 def generate_tests_with_llm(swagger: dict, login_endpoint=None, model="llama3.2"):
     """
@@ -30,93 +71,137 @@ def generate_tests_with_llm(swagger: dict, login_endpoint=None, model="llama3.2"
             if method.lower() in ["get", "post", "put", "delete", "patch"]:
                 expected_test_count += 2  # positive + unauthorized
     
-    print(f"\n[LLM] Using {model} to generate tests for {len(paths)} endpoints...")
-    print(f"Expected ~{expected_test_count} test cases")
-    print("⚡ FASTEST (<90s): qwen2:0.5b, tinyllama:latest")
-    print("✓ GOOD (90-180s): llama3.2:1b, gemma2:2b")
-    print("✓ ACCEPTABLE (180-300s): llama3:8b, gemma3:1b")
-    print("✗ AVOID (>300s): phi3\n")
+    print(f"\n[LLM] Using {model} to generate tests for {len(paths)} endpoints...", flush=True)
+    print(f"Expected ~{expected_test_count} test cases", flush=True)
     
     # Start timing
     start_time = time.time()
     
-    # Process endpoints in small batches for faster response times
-    batch_size = 2  # Small batches = faster per-batch execution
+    # Process endpoints one at a time for maximum reliability
+    batch_size = 1  # 1 endpoint at a time = guaranteed completion
     all_tests = []
     path_items = list(paths.items())
     total_batches = (len(path_items) + batch_size - 1) // batch_size
     
-    print(f"Processing {len(paths)} endpoints in {total_batches} batches of up to {batch_size} endpoints each\n")
+    print(f"Processing {len(paths)} endpoints in {total_batches} batches of up to {batch_size} endpoints each\n", flush=True)
+    print(f"Running 2 batches in parallel for faster processing...\n", flush=True)
     
-    for i in range(0, len(path_items), batch_size):
-        batch_paths = dict(path_items[i:i + batch_size])
-        batch_num = (i // batch_size) + 1
+    # Process with 2 parallel batches at a time
+    lock = Lock()
+    
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        futures = []
         
-        batch_tests, test_counter = generate_batch_with_llm(
-            batch_paths, 
-            swagger.get("info", {}), 
-            login_path, 
-            model, 
-            batch_num, 
-            total_batches, 
-            test_counter
-        )
-        all_tests.extend(batch_tests)
+        for i in range(0, len(path_items), batch_size):
+            batch_paths = dict(path_items[i:i + batch_size])
+            batch_num = (i // batch_size) + 1
+            
+            future = executor.submit(
+                generate_batch_with_llm,
+                batch_paths,
+                swagger,
+                login_path,
+                model,
+                batch_num,
+                total_batches,
+                test_counter
+            )
+            futures.append((future, batch_num))
+        
+        # Collect results as they complete
+        for future, batch_num in futures:
+            try:
+                batch_tests, test_counter = future.result(timeout=300)
+                
+                if batch_tests:
+                    with lock:
+                        all_tests.extend(batch_tests)
+                    print(f"  ✓ Batch {batch_num}: Added {len(batch_tests)} tests (Total so far: {len(all_tests)})\n", flush=True)
+                else:
+                    print(f"  ✗ Batch {batch_num}: Generated 0 tests (skipping)\n", flush=True)
+            except Exception as e:
+                print(f"  ✗ Batch {batch_num}: ERROR - {e}\n", flush=True)
     
     # Calculate elapsed time
     elapsed_time = time.time() - start_time
     
+    # Re-number test IDs sequentially to avoid gaps from parallel processing
+    for idx, test in enumerate(all_tests, 1):
+        test['id'] = f"test{idx:03d}"
+    
     # Report results (no fallback - use LLM results only)
     if not all_tests:
-        print(f"\nERROR: LLM generation failed to produce any valid tests (took {elapsed_time:.1f}s)")
-        print("TIP: Check if Ollama is running and the model is available")
-        print("TIP: Try a different model like qwen2:0.5b or tinyllama")
+        print(f"\nERROR: LLM generation failed to produce any valid tests (took {elapsed_time:.1f}s)", flush=True)
+        print("TIP: Check if Ollama is running and the model is available", flush=True)
         return []
     
     if len(all_tests) < expected_test_count:
-        print(f"\nWARNING: LLM generated {len(all_tests)}/{expected_test_count} expected tests (took {elapsed_time:.1f}s)")
-        print("TIP: Increase num_predict tokens or use a larger model for better coverage")
+        print(f"\nWARNING: LLM generated {len(all_tests)}/{expected_test_count} expected tests (took {elapsed_time:.1f}s)", flush=True)
+        print("TIP: Increase num_predict tokens or use a larger model for better coverage", flush=True)
     else:
-        print(f"\nSUCCESS: LLM generated {len(all_tests)} test cases in {elapsed_time:.1f} seconds")
+        print(f"\nSUCCESS: LLM generated {len(all_tests)} test cases in {elapsed_time:.1f} seconds", flush=True)
     
     return all_tests
 
 
-def generate_batch_with_llm(paths_batch: dict, api_info: dict, login_endpoint: str, model: str, batch_num: int, total_batches: int, test_counter: int):
+def generate_batch_with_llm(paths_batch: dict, swagger: dict, login_endpoint: str, model: str, batch_num: int, total_batches: int, test_counter: int):
     """
     Generate test cases for a batch of endpoints using LLM.
     """
     
-    # Create simplified spec for this batch
+    # Create simplified spec for this batch with schema information
     batch_spec = {
         "paths": paths_batch
     }
+    
+    # Add example request bodies for POST/PUT/PATCH endpoints
+    request_body_examples = {}
+    for path, methods in paths_batch.items():
+        for method in methods:
+            if method.lower() in ['post', 'put', 'patch']:
+                schema = get_request_body_schema(swagger, path, method)
+                if schema:
+                    sample_data = generate_sample_data(swagger, schema)
+                    if sample_data:
+                        request_body_examples[f"{method.upper()} {path}"] = sample_data
+    
     swagger_str = json.dumps(batch_spec, indent=2)
     
-    # Create the prompt for the LLM - simplified for faster processing
-    prompt = f"""Generate test cases for the API endpoints below. For EACH endpoint and method, create exactly 2 tests:
-1. Positive test with valid auth (expect 200)
-2. Negative test with invalid auth (expect 401)
+    # Create a VERY strict prompt with request body examples
+    endpoint_count = len(paths_batch)
+    expected_tests = endpoint_count * 2
+    
+    examples_str = ""
+    if request_body_examples:
+        examples_str = "\n\nRequest Body Examples (use these for POST/PUT/PATCH):\n" + json.dumps(request_body_examples, indent=2)
+    
+    prompt = f"""CRITICAL: Generate EXACTLY {expected_tests} test cases. NO MORE, NO LESS.
 
-Endpoints:
-{swagger_str}
+You have {endpoint_count} endpoints. Generate EXACTLY 2 tests for EACH endpoint = {expected_tests} total tests.
 
-IMPORTANT:
-- Replace path parameters like {{id}} or {{petId}} with "1"
-- Use simple headers: {{"accept": "application/json"}}
-- Return ONLY a valid JSON array, no explanation
+Endpoints to test: {list(paths_batch.keys())}
 
-Example format:
-[
-  {{"id":"test001","test_name":"GET /pet/1 - Valid Auth","method":"GET","endpoint":"/pet/1","expected_status":200,"auth":"valid","headers":{{"accept":"application/json"}}}},
-  {{"id":"test002","test_name":"GET /pet/1 - Invalid Auth","method":"GET","endpoint":"/pet/1","expected_status":401,"auth":"invalid","headers":{{"accept":"application/json"}}}}
-]
+For EACH endpoint above, you MUST generate these 2 tests:
+1. Valid positive test (status 200 or 201 for POST)
+2. Negative test:
+   - GET: Unauthorized test (status 401, auth="invalid")
+   - POST/PUT/DELETE/PATCH: Invalid input test (status 404 or 400, use non-existent ID like 999999)
 
-Generate the JSON array now:"""
+IMPORTANT JSON RULES:
+- Use DOUBLE QUOTES for all keys and string values
+- NO single quotes, NO template literals, NO variables
+- For path parameters like {{{{petId}}}}, replace with actual value: /pet/1 for valid, /pet/999999 for invalid
+- For POST/PUT/PATCH: include "body" field with request payload
+- Output ONLY valid JSON array with {expected_tests} test objects{examples_str}
+
+EXACT FORMAT (copy this structure):
+[{{"id":"test001","test_name":"GET /pet/1 - Valid","method":"GET","endpoint":"/pet/1","expected_status":200,"auth":"valid","headers":{{"accept":"application/json"}}}},{{"id":"test002","test_name":"GET /pet/1 - Unauthorized","method":"GET","endpoint":"/pet/1","expected_status":401,"auth":"invalid","headers":{{"accept":"application/json"}}}}]
+
+Generate {expected_tests} tests (2 per endpoint, no exceptions):"""
 
     try:
         batch_start = time.time()
-        print(f"  Processing {len(paths_batch)} endpoints (batch {batch_num}/{total_batches})...")
+        print(f"  Processing {len(paths_batch)} endpoints (batch {batch_num}/{total_batches})...", flush=True)
         
         # Call Ollama API with optimized parameters for SPEED
         response = ollama.chat(
@@ -127,8 +212,8 @@ Generate the JSON array now:"""
             }],
             options={
                 'temperature': 0.1,
-                'num_predict': 16384,  # Increased for all endpoints at once
-                'num_ctx': 8192 # Increased context window
+                'num_predict': 32768,  # Maximum limit to ensure complete generation
+                'num_ctx': 16384
             }
         )
         
@@ -136,7 +221,7 @@ Generate the JSON array now:"""
         
         # Extract the response content
         llm_output = response['message']['content']
-        print(f"  LLM response received ({len(llm_output)} chars, {batch_time:.1f}s)")
+        print(f"  LLM response received ({len(llm_output)} chars, {batch_time:.1f}s)", flush=True)
         
         # Extract JSON array with improved logic
         original_output = llm_output
@@ -181,19 +266,50 @@ Generate the JSON array now:"""
         if end_idx > 0:
             llm_output = llm_output[:end_idx]
         
+        # Try to fix common JSON errors before parsing
+        llm_output = fix_json_format(llm_output)
+        
         tests = json.loads(llm_output)
+        
+        print(f"  Raw LLM output: {len(tests)} test objects parsed", flush=True)
+        
+        # Hard limit: Only take expected number of tests (batch_size * 2)
+        max_tests = len(paths_batch) * 2
+        if len(tests) > max_tests:
+            print(f"  WARNING: LLM generated {len(tests)} tests, limiting to {max_tests}", flush=True)
+            tests = tests[:max_tests]
+        elif len(tests) < max_tests:
+            print(f"  WARNING: LLM only generated {len(tests)}/{max_tests} expected tests", flush=True)
         
         # Validate and ensure all tests have required fields
         validated_tests = []
-        for test in tests:
+        skipped_count = 0
+        for idx, test in enumerate(tests, 1):
             if all(k in test for k in ['method', 'endpoint', 'expected_status']):
+                endpoint = test['endpoint']
+                
+                # Skip tests with empty or invalid endpoints
+                if not endpoint or not isinstance(endpoint, str) or endpoint.strip() in ["", '""', "null"]:
+                    print(f"    SKIPPED test {idx}: Empty endpoint", flush=True)
+                    skipped_count += 1
+                    continue
+                
+                # Ensure endpoint starts with /
+                endpoint = endpoint.strip()
+                if not endpoint.startswith('/'):
+                    endpoint = '/' + endpoint
+                
+                # Replace path parameters if they still have {}
+                import random
+                endpoint = re.sub(r'\{[^}]+\}', lambda m: '1' if 'valid' in test.get('test_name', '').lower() else str(random.randint(100000, 999999)), endpoint)
+                
                 # Ensure test has all required fields with defaults
                 validated_test = {
                     "id": f"test{test_counter:03d}",
-                    "test_name": test.get("test_name", f"{test['method']} {test['endpoint']}"),
-                    "method": test["method"],
-                    "endpoint": test["endpoint"],
-                    "expected_status": test["expected_status"],
+                    "test_name": test.get("test_name", f"{test['method']} {endpoint}"),
+                    "method": test["method"].upper(),
+                    "endpoint": endpoint,
+                    "expected_status": int(test["expected_status"]) if isinstance(test["expected_status"], str) else test["expected_status"],
                     "auth": test.get("auth", "valid"),
                     "headers": test.get("headers", {
                         "accept": "application/json",
@@ -201,32 +317,45 @@ Generate the JSON array now:"""
                         "Locale": "en_US"
                     })
                 }
+                # Add body if present and not empty
+                if "body" in test and test["body"]:
+                    validated_test["body"] = test["body"]
+                
                 validated_tests.append(validated_test)
                 test_counter += 1
             else:
-                print(f"    WARNING: Skipping invalid test: missing required fields {[k for k in ['method', 'endpoint', 'expected_status'] if k not in test]}")
+                missing = [k for k in ['method', 'endpoint', 'expected_status'] if k not in test]
+                print(f"    SKIPPED test {idx}: Missing {missing}", flush=True)
+                skipped_count += 1
+        
+        if skipped_count > 0:
+            print(f"  Total skipped: {skipped_count}, Valid tests: {len(validated_tests)}", flush=True)
         
         if validated_tests:
-            print(f"  SUCCESS: Batch {batch_num} generated {len(validated_tests)} test cases in {batch_time:.1f}s")
+            print(f"  SUCCESS: Batch {batch_num} generated {len(validated_tests)} test cases in {batch_time:.1f}s", flush=True)
         else:
-            print(f"  WARNING: Batch {batch_num} generated 0 valid test cases (took {batch_time:.1f}s)")
+            print(f"  WARNING: Batch {batch_num} generated 0 valid test cases (took {batch_time:.1f}s)", flush=True)
         
         return validated_tests, test_counter
         
     except json.JSONDecodeError as e:
-        print(f"  ERROR: Batch {batch_num} JSON parse error: {e}")
+        print(f"  ERROR: Batch {batch_num} JSON parse error: {e}", flush=True)
         if 'llm_output' in locals():
-            print(f"  Extracted JSON length: {len(llm_output)} chars")
-            print(f"  JSON preview (first 300 chars): {llm_output[:300]}...")
-            print(f"  JSON preview (last 200 chars): ...{llm_output[-200:]}")
+            print(f"  Extracted JSON length: {len(llm_output)} chars", flush=True)
+            print(f"  JSON preview (first 300 chars): {llm_output[:300]}...", flush=True)
+            print(f"  JSON preview (last 200 chars): ...{llm_output[-200:]}", flush=True)
         if 'original_output' in locals():
-            print(f"  Original LLM output length: {len(original_output)} chars")
-        print(f"  TIP: Try using 'llama3.2:1b' or 'qwen2.5:0.5b' for better JSON compliance")
+            print(f"  Original LLM output length: {len(original_output)} chars", flush=True)
+            # Show what caused the error
+            print(f"  ERROR at position {e.pos}: {original_output[max(0,e.pos-50):min(len(original_output),e.pos+50)]}", flush=True)
+        print(f"  TIP: Model '{model}' may not be good at JSON. Try 'qwen2.5:0.5b' or 'llama3.2:1b'", flush=True)
         return [], test_counter
         
     except Exception as e:
-        print(f"  ERROR: Batch {batch_num} error: {type(e).__name__}: {e}")
-        print(f"  TIP: Check if Ollama is running and the model '{model}' is available")
+        print(f"  ERROR: Batch {batch_num} error: {type(e).__name__}: {e}", flush=True)
+        if 'llm_output' in locals():
+            print(f"  LLM output preview: {llm_output[:200] if llm_output else 'None'}...", flush=True)
+        print(f"  TIP: Check if Ollama is running and the model '{model}' is available", flush=True)
         return [], test_counter
 
 

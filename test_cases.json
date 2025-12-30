@@ -1,9 +1,9 @@
 [
   {
     "id": "test001",
-    "test_name": "GET /pet/1 - Valid Auth",
+    "test_name": "GET /pet - Valid",
     "method": "GET",
-    "endpoint": "/pet/1",
+    "endpoint": "/pet",
     "expected_status": 200,
     "auth": "valid",
     "headers": {
@@ -12,9 +12,9 @@
   },
   {
     "id": "test002",
-    "test_name": "GET /pet/1 - Invalid Auth",
+    "test_name": "GET /pet - Unauthorized",
     "method": "GET",
-    "endpoint": "/pet/1",
+    "endpoint": "/pet",
     "expected_status": 401,
     "auth": "invalid",
     "headers": {
@@ -23,9 +23,9 @@
   },
   {
     "id": "test003",
-    "test_name": "GET /pet/1 - Valid Auth",
+    "test_name": "GET /pet/findByStatus - Valid",
     "method": "GET",
-    "endpoint": "/pet/1",
+    "endpoint": "/pet/findByStatus?status=available",
     "expected_status": 200,
     "auth": "valid",
     "headers": {
@@ -34,9 +34,9 @@
   },
   {
     "id": "test004",
-    "test_name": "GET /pet/1 - Invalid Auth",
+    "test_name": "GET /pet/findByStatus - Unauthorized",
     "method": "GET",
-    "endpoint": "/pet/1",
+    "endpoint": "/pet/findByStatus?status=available",
     "expected_status": 401,
     "auth": "invalid",
     "headers": {
@@ -45,9 +45,9 @@
   },
   {
     "id": "test005",
-    "test_name": "GET /pet/1 - Valid Auth",
+    "test_name": "GET /pet/findByTags - Valid",
     "method": "GET",
-    "endpoint": "/pet/1",
+    "endpoint": "/pet/findByTags",
     "expected_status": 200,
     "auth": "valid",
     "headers": {
@@ -56,9 +56,9 @@
   },
   {
     "id": "test006",
-    "test_name": "GET /pet/1 - Invalid Auth",
+    "test_name": "GET /pet/findByTags - Unauthorized",
     "method": "GET",
-    "endpoint": "/pet/1",
+    "endpoint": "/pet/findByTags",
     "expected_status": 401,
     "auth": "invalid",
     "headers": {
@@ -67,7 +67,7 @@
   },
   {
     "id": "test007",
-    "test_name": "GET /pet/1 - Valid Auth",
+    "test_name": "GET /pet/1 - Valid",
     "method": "GET",
     "endpoint": "/pet/1",
     "expected_status": 200,
@@ -78,10 +78,10 @@
   },
   {
     "id": "test008",
-    "test_name": "GET /pet/1 - Invalid Auth",
+    "test_name": "GET /pet/999999 - Invalid",
     "method": "GET",
-    "endpoint": "/pet/1",
-    "expected_status": 401,
+    "endpoint": "/pet/999999",
+    "expected_status": 404,
     "auth": "invalid",
     "headers": {
       "accept": "application/json"
@@ -89,31 +89,39 @@
   },
   {
     "id": "test009",
-    "test_name": "GET /user/createWithList - Valid Auth",
-    "method": "GET",
-    "endpoint": "/user/createWithList",
-    "expected_status": 200,
+    "test_name": "POST /pet/1 - Valid",
+    "method": "POST",
+    "endpoint": "/pet/1/uploadImage",
+    "expected_status": 201,
     "auth": "valid",
     "headers": {
-      "accept": "application/json"
+      "accept": "application/json",
+      "Content-Type": "image/jpeg"
+    },
+    "body": {
+      "image": "string"
     }
   },
   {
     "id": "test010",
-    "test_name": "GET /user/createWithList - Invalid Auth",
-    "method": "GET",
-    "endpoint": "/user/createWithList",
-    "expected_status": 401,
-    "auth": "invalid",
+    "test_name": "POST /pet/999999 - Invalid ID",
+    "method": "POST",
+    "endpoint": "/pet/999999/uploadImage",
+    "expected_status": 404,
+    "auth": "valid",
     "headers": {
-      "accept": "application/json"
+      "accept": "application/json",
+      "Content-Type": "image/jpeg"
+    },
+    "body": {
+      "image": "string"
     }
   },
   {
     "id": "test011",
-    "test_name": "GET /pet/1 - Valid Auth",
+    "test_name": "GET /store/inventory - Valid",
     "method": "GET",
-    "endpoint": "/pet/1",
+    "endpoint": "/store/inventory",
     "expected_status": 200,
     "auth": "valid",
     "headers": {
@@ -122,9 +130,9 @@
   },
   {
     "id": "test012",
-    "test_name": "GET /pet/1 - Invalid Auth",
+    "test_name": "GET /store/inventory - Unauthorized",
     "method": "GET",
-    "endpoint": "/pet/1",
+    "endpoint": "/store/inventory",
     "expected_status": 401,
     "auth": "invalid",
     "headers": {
@@ -133,9 +141,49 @@
   },
   {
     "id": "test013",
-    "test_name": "GET /user/1 - Valid Auth",
+    "test_name": "POST /store/order - Valid",
+    "method": "POST",
+    "endpoint": "/store/order",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 10,
+      "petId": 198772,
+      "quantity": 7,
+      "shipDate": "string",
+      "status": "approved"
+    }
+  },
+  {
+    "id": "test014",
+    "test_name": "POST /store/order - Invalid Input",
+    "method": "POST",
+    "endpoint": "/store/order",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 999999,
+      "petId": 999999,
+      "quantity": 99999,
+      "shipDate": "invalid date",
+      "status": "invalid status"
+    }
+  },
+  {
+    "id": "test015",
+    "test_name": "GET /store/order/123 - Valid",
     "method": "GET",
-    "endpoint": "/user/1",
+    "endpoint": "/store/order/123",
     "expected_status": 200,
     "auth": "valid",
     "headers": {
@@ -143,11 +191,153 @@
     }
   },
   {
-    "id": "test014",
-    "test_name": "GET /user/1 - Invalid Auth",
+    "id": "test016",
+    "test_name": "GET /store/order/999999 - Unauthorized",
     "method": "GET",
-    "endpoint": "/user/1",
+    "endpoint": "/store/order/999999",
     "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json"
+    }
+  },
+  {
+    "id": "test017",
+    "test_name": "GET /user - Valid",
+    "method": "GET",
+    "endpoint": "/user",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json"
+    }
+  },
+  {
+    "id": "test018",
+    "test_name": "GET /user - Unauthorized",
+    "method": "GET",
+    "endpoint": "/user",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json"
+    }
+  },
+  {
+    "id": "test019",
+    "test_name": "POST /user/createWithList - Valid",
+    "method": "POST",
+    "endpoint": "/user/createWithList",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "username": "theUser",
+      "firstName": "John",
+      "lastName": "James",
+      "email": "john@email.com"
+    }
+  },
+  {
+    "id": "test020",
+    "test_name": "POST /user/createWithList - Invalid Input",
+    "method": "POST",
+    "endpoint": "/user/createWithList",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "username": "invalidUser",
+      "firstName": "Invalid",
+      "lastName": "Invalid",
+      "email": "invalid@invalid.com"
+    }
+  },
+  {
+    "id": "test021",
+    "test_name": "POST /user/login - Valid",
+    "method": "POST",
+    "endpoint": "/user/login",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "username": "admin",
+      "password": "password"
+    }
+  },
+  {
+    "id": "test022",
+    "test_name": "POST /user/login - Invalid input test",
+    "method": "POST",
+    "endpoint": "/user/login",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "username": "invalid",
+      "password": "wrong"
+    }
+  },
+  {
+    "id": "test023",
+    "test_name": "GET /user/logout - Valid",
+    "method": "GET",
+    "endpoint": "/user/logout",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test024",
+    "test_name": "GET /user/logout - Unauthorized",
+    "method": "GET",
+    "endpoint": "/user/logout",
+    "expected_status": 401,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test025",
+    "test_name": "GET /user/theUser - Valid",
+    "method": "GET",
+    "endpoint": "/user/theUser",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json"
+    }
+  },
+  {
+    "id": "test026",
+    "test_name": "GET /user/999999 - Invalid ID",
+    "method": "GET",
+    "endpoint": "/user/999999",
+    "expected_status": 404,
     "auth": "invalid",
     "headers": {
       "accept": "application/json"
