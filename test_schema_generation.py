@@ -4,8 +4,8 @@ Test script to verify schema-based payload generation
 import json
 from engine.swagger import load_swagger, get_request_body_schema, generate_sample_data, resolve_ref
 
-# Load Petstore Swagger
-swagger_url = "https://petstore3.swagger.io/api/v3/openapi.json"
+# Load FakeStoreAPI Swagger
+swagger_url = "http://127.0.0.1:8000/fakestoreapi_swagger.json"
 print("Loading Swagger spec...")
 swagger = load_swagger(swagger_url)
 print(f"✓ Loaded Swagger spec\n")

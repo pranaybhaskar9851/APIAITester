@@ -170,7 +170,7 @@ else:
 ### Actual Request Sent:
 ```bash
 curl -X 'POST' \
-  'https://petstore3.swagger.io/api/v3/pet' \
+  'https://fakestoreapi.com/products' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{

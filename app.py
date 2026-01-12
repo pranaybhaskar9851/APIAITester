@@ -560,7 +560,7 @@ def home():
                         <div class="section-title">Authentication</div>
                         
                         <div class="info-box">
-                            💡 <strong>Note:</strong> Enter your API key below. For Petstore API, you can use "test-api-key-123" as a test value.
+                            💡 <strong>Note:</strong> Enter your API key below. For FakeStoreAPI, you can use "test-api-key-123" as a test value.
                         </div>
                         
                         <div class="form-group">

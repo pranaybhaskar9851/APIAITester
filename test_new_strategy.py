@@ -7,8 +7,8 @@ import json
 from engine.swagger import load_swagger
 from engine.generator import generate_tests
 
-# Load Petstore Swagger
-swagger_url = "https://petstore3.swagger.io/api/v3/openapi.json"
+# Load FakeStoreAPI Swagger
+swagger_url = "http://127.0.0.1:8000/fakestoreapi_swagger.json"
 print("Loading Swagger spec...")
 swagger = load_swagger(swagger_url)
 print(f"✓ Loaded Swagger spec\n")

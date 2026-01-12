@@ -28,7 +28,7 @@ Automatically generate and execute comprehensive API tests from OpenAPI/Swagger 
 - 📊 **Comprehensive HTML Reports** with endpoint-wise statistics
 - 📄 **JUnit XML Reports** for CI/CD integration
 - 🔐 **API Key Authentication** support
-- 🎯 **Petstore API Compatible** out of the box
+- 🎯 **FakeStoreAPI Compatible** out of the box
 - 🔢 **Sequential Test IDs** (test001, test002...) for better readability
 - 🔄 **Test Case Reuse** for faster subsequent runs
 
@@ -232,13 +232,13 @@ You should see the API AI Tester interface! 🎉
 
 ### 1. **Configure API Settings**
    - **Base URL**: Enter the API base URL
-     - Default: `https://petstore3.swagger.io/api/v3`
+     - Default: `https://fakestoreapi.com`
    - **Swagger/OpenAPI Spec URL**: Enter the OpenAPI specification URL
-     - Default: `https://petstore3.swagger.io/api/v3/openapi.json`
+     - Default: `http://127.0.0.1:8000/fakestoreapi_swagger.json`
 
 ### 2. **Authentication**
    - **API Key**: Enter your API key
-     - Default: `test-api-key-123` (works with Petstore API)
+     - Default: `test-api-key-123` (works with FakeStoreAPI)
      - Leave empty for public endpoints
 
 ### 3. **Test Generation Options**
@@ -393,7 +393,7 @@ pip install -r requirements.txt --force-reinstall
 - Check if the target API is accessible
 - Verify Base URL and OpenAPI Spec URL are correct
 - Check firewall/network settings
-- For Petstore API, ensure internet connection is active
+- For FakeStoreAPI, ensure internet connection is active
 
 ---
 
@@ -404,9 +404,9 @@ pip install -r requirements.txt --force-reinstall
 Edit [app.py](app.py) to change default values:
 
 ```python
-# Around line 528-535
-value="https://petstore3.swagger.io/api/v3"           # Change Base URL
-value="https://petstore3.swagger.io/api/v3/openapi.json"  # Change OpenAPI URL
+# Around line 550-554
+value="https://fakestoreapi.com"                      # Change Base URL
+value="http://127.0.0.1:8000/fakestoreapi_swagger.json"  # Change OpenAPI URL
 value="test-api-key-123"                              # Change default API key
 ```
 
