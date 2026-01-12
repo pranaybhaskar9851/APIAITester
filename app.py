@@ -547,11 +547,11 @@ def home():
                         <div class="section-title">API Configuration</div>
                         <div class="form-group">
                             <label>Base URL</label>
-                            <input type="text" name="base_url" value="https://petstore3.swagger.io/api/v3" placeholder="https://petstore3.swagger.io/api/v3"/>
+                            <input type="text" name="base_url" value="https://fakestoreapi.com" placeholder="https://fakestoreapi.com"/>
                         </div>
                         <div class="form-group">
                             <label>Swagger/OpenAPI Spec URL</label>
-                            <input type="text" name="swagger" value="https://petstore3.swagger.io/api/v3/openapi.json" placeholder="https://petstore3.swagger.io/api/v3/openapi.json"/>
+                            <input type="text" name="swagger" value="http://127.0.0.1:8000/fakestoreapi_swagger.json" placeholder="http://127.0.0.1:8000/fakestoreapi_swagger.json"/>
                         </div>
                     </div>
                     
