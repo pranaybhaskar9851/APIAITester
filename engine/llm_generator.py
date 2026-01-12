@@ -154,6 +154,28 @@ def generate_batch_with_llm(paths_batch: dict, swagger: dict, login_endpoint: st
         "paths": paths_batch
     }
     
+    # Count total methods (each path+method combination is an endpoint)
+    method_count = 0
+    endpoint_list = []
+    expected_tests = 0
+    for path, methods in paths_batch.items():
+        for method in methods:
+            if method.lower() in ['get', 'post', 'put', 'delete', 'patch']:
+                method_count += 1
+                endpoint_list.append(f"{method.upper()} {path}")
+                # Calculate expected tests based on method type (matching rule-based generator)
+                if method.lower() == 'get':
+                    expected_tests += 2  # 1 valid + 1 unauthorized
+                elif method.lower() == 'post':
+                    expected_tests += 3  # 2 valid + 1 invalid body
+                elif method.lower() in ['put', 'patch']:
+                    expected_tests += 3  # 2 valid + 1 invalid ID
+                elif method.lower() == 'delete':
+                    expected_tests += 2  # 1 valid + 1 invalid ID
+    
+    print(f"  DEBUG: Batch {batch_num} endpoints: {endpoint_list}", flush=True)
+    print(f"  DEBUG: Expected tests: {expected_tests}", flush=True)
+    
     # Add example request bodies for POST/PUT/PATCH endpoints
     request_body_examples = {}
     for path, methods in paths_batch.items():
@@ -167,37 +189,53 @@ def generate_batch_with_llm(paths_batch: dict, swagger: dict, login_endpoint: st
     
     swagger_str = json.dumps(batch_spec, indent=2)
     
-    # Create a VERY strict prompt with request body examples
-    endpoint_count = len(paths_batch)
-    expected_tests = endpoint_count * 2
+    # endpoint_count is for display, expected_tests is accurately calculated above
+    endpoint_count = method_count  # Count methods, not paths
     
     examples_str = ""
     if request_body_examples:
         examples_str = "\n\nRequest Body Examples (use these for POST/PUT/PATCH):\n" + json.dumps(request_body_examples, indent=2)
     
-    prompt = f"""CRITICAL: Generate EXACTLY {expected_tests} test cases. NO MORE, NO LESS.
+    prompt = f"""Generate EXACTLY {expected_tests} test cases in valid JSON array format.
 
-You have {endpoint_count} endpoints. Generate EXACTLY 2 tests for EACH endpoint = {expected_tests} total tests.
+OPERATIONS ({endpoint_count} total):
+{chr(10).join(f"{i+1}. {ep}" for i, ep in enumerate(endpoint_list))}
 
-Endpoints to test: {list(paths_batch.keys())}
+CRITICAL: Use the EXACT endpoint path as listed above for each test. For example:
+- If the operation is "GET /products/{{{{id}}}}", the endpoint in your test MUST be "/products/{{{{id}}}}" (then replace {{{{id}}}} with 1 or 999999)
+- If the operation is "POST /products", the endpoint MUST be "/products" (no ID)
+- DO NOT add or remove path segments
 
-For EACH endpoint above, you MUST generate these 2 tests:
-1. Valid positive test (status 200 or 201 for POST)
-2. Negative test:
-   - GET: Unauthorized test (status 401, auth="invalid")
-   - POST/PUT/DELETE/PATCH: Invalid input test (status 404 or 400, use non-existent ID like 999999)
+TEST RULES PER METHOD:
+• GET: 2 tests (Valid Request + Unauthorized)
+• POST: 3 tests (Valid Request 1 + Valid Request 2 + Invalid Body)
+• PUT: 3 tests (Valid Request 1 + Valid Request 2 + Invalid ID)
+• DELETE: 2 tests (Valid Request + Invalid ID)
+• PATCH: 3 tests (same as PUT)
 
-IMPORTANT JSON RULES:
-- Use DOUBLE QUOTES for all keys and string values
-- NO single quotes, NO template literals, NO variables
-- For path parameters like {{{{petId}}}}, replace with actual value: /pet/1 for valid, /pet/999999 for invalid
-- For POST/PUT/PATCH: include "body" field with request payload
-- Output ONLY valid JSON array with {expected_tests} test objects{examples_str}
+DETAILED RULES:
+GET Method:
+  1. Valid: endpoint with {{{{id}}}}→1, status 200, auth="valid", NO body
+  2. Unauthorized: same endpoint, status 200, auth="invalid", NO body
 
-EXACT FORMAT (copy this structure):
-[{{"id":"test001","test_name":"GET /pet/1 - Valid","method":"GET","endpoint":"/pet/1","expected_status":200,"auth":"valid","headers":{{"accept":"application/json"}}}},{{"id":"test002","test_name":"GET /pet/1 - Unauthorized","method":"GET","endpoint":"/pet/1","expected_status":401,"auth":"invalid","headers":{{"accept":"application/json"}}}}]
+POST Method:
+  1. Valid Request 1: status 201, auth="valid", FULL body from examples
+  2. Valid Request 2: status 201, auth="valid", FULL body from examples
+  3. Invalid Body: status 400, auth="valid", body={{}}
 
-Generate {expected_tests} tests (2 per endpoint, no exceptions):"""
+PUT/PATCH Method:
+  1. Valid Request 1: {{{{id}}}}→1, status 200, auth="valid", FULL body from examples
+  2. Valid Request 2: {{{{id}}}}→1, status 200, auth="valid", FULL body from examples
+  3. Invalid ID: {{{{id}}}}→999999, status 404, auth="valid", FULL body from examples
+
+DELETE Method:
+  1. Valid Request: {{{{id}}}}→1, status 200, auth="valid", NO body
+  2. Invalid ID: {{{{id}}}}→999999, status 404, auth="valid", NO body{examples_str}
+
+JSON TEMPLATE:
+{{"id":"test001","test_name":"<METHOD> <path> - <Type>","method":"<METHOD>","endpoint":"<path>","expected_status":<code>,"auth":"valid","headers":{{"accept":"application/json","Content-Type":"application/json","Locale":"en_US"}}}}
+
+Output {expected_tests} tests as JSON array:"""
 
     try:
         batch_start = time.time()
@@ -273,20 +311,24 @@ Generate {expected_tests} tests (2 per endpoint, no exceptions):"""
         
         print(f"  Raw LLM output: {len(tests)} test objects parsed", flush=True)
         
-        # Hard limit: Only take expected number of tests (batch_size * 2)
-        max_tests = len(paths_batch) * 2
-        if len(tests) > max_tests:
-            print(f"  WARNING: LLM generated {len(tests)} tests, limiting to {max_tests}", flush=True)
-            tests = tests[:max_tests]
-        elif len(tests) < max_tests:
-            print(f"  WARNING: LLM only generated {len(tests)}/{max_tests} expected tests", flush=True)
+        # Validate against expected test count (NOT endpoint count!)
+        if len(tests) > expected_tests:
+            print(f"  WARNING: LLM generated {len(tests)} tests, limiting to {expected_tests}", flush=True)
+            tests = tests[:expected_tests]
+        elif len(tests) < expected_tests:
+            print(f"  WARNING: LLM only generated {len(tests)}/{expected_tests} expected tests", flush=True)
         
         # Validate and ensure all tests have required fields
         validated_tests = []
         skipped_count = 0
+        methods_generated = {}
         for idx, test in enumerate(tests, 1):
             if all(k in test for k in ['method', 'endpoint', 'expected_status']):
                 endpoint = test['endpoint']
+                method = test['method'].upper()
+                
+                # Track methods being generated
+                methods_generated[method] = methods_generated.get(method, 0) + 1
                 
                 # Skip tests with empty or invalid endpoints
                 if not endpoint or not isinstance(endpoint, str) or endpoint.strip() in ["", '""', "null"]:
@@ -330,6 +372,8 @@ Generate {expected_tests} tests (2 per endpoint, no exceptions):"""
         
         if skipped_count > 0:
             print(f"  Total skipped: {skipped_count}, Valid tests: {len(validated_tests)}", flush=True)
+        
+        print(f"  Methods generated: {methods_generated}", flush=True)
         
         if validated_tests:
             print(f"  SUCCESS: Batch {batch_num} generated {len(validated_tests)} test cases in {batch_time:.1f}s", flush=True)

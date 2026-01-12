@@ -1,7 +1,24 @@
 
 import requests
+import json
+import os
 
 def load_swagger(swagger_input: str) -> dict:
+    # Check if it's a local file path
+    if swagger_input.startswith('file://') or os.path.isfile(swagger_input):
+        # Load from local file
+        file_path = swagger_input.replace('file://', '')
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    # Check if it's trying to load from the same server (deadlock prevention)
+    elif '127.0.0.1:8000' in swagger_input or 'localhost:8000' in swagger_input:
+        # Extract filename and load directly
+        filename = swagger_input.split('/')[-1]
+        if os.path.isfile(filename):
+            with open(filename, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    
+    # Otherwise fetch from URL
     resp = requests.get(swagger_input, timeout=20)
     resp.raise_for_status()
     return resp.json()
@@ -49,14 +66,22 @@ def generate_sample_data(swagger: dict, schema: dict, depth=0, max_depth=3):
         properties = schema.get('properties', {})
         required_fields = schema.get('required', [])
         
+        # Always include required fields
+        for prop_name in required_fields:
+            if prop_name in properties:
+                value = generate_sample_data(swagger, properties[prop_name], depth + 1, max_depth)
+                if value is not None:
+                    obj[prop_name] = value
+        
+        # Add a few more fields if needed (up to 5 total)
         for prop_name, prop_schema in properties.items():
-            # Only include required fields or first few properties
-            if prop_name in required_fields or len(obj) < 5:
+            if prop_name not in obj and len(obj) < 5:
                 value = generate_sample_data(swagger, prop_schema, depth + 1, max_depth)
                 if value is not None:
                     obj[prop_name] = value
         
-        return obj if obj else {}
+        # Return None for truly empty objects instead of {}
+        return obj if obj else None
     
     elif schema_type == 'array':
         items_schema = schema.get('items', {})
@@ -81,7 +106,7 @@ def generate_sample_data(swagger: dict, schema: dict, depth=0, max_depth=3):
         elif 'default' in schema:
             return schema['default']
         else:
-            return 0
+            return 10  # Use 10 instead of 0 (better for IDs)
     
     elif schema_type == 'number':
         if 'example' in schema:

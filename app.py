@@ -10,7 +10,17 @@ from datetime import datetime
 import json
 import os
 
-app = FastAPI(title="API AI Tester V7")
+app = FastAPI(title="API AI Tester")
+
+@app.get("/fakestoreapi_swagger.json")
+def get_fakestore_swagger():
+    """Serve the FakeStoreAPI swagger file"""
+    return FileResponse("fakestoreapi_swagger.json", media_type="application/json")
+
+@app.get("/docs-data.json")
+def get_docs_data():
+    """Serve the docs-data.json OpenAPI specification file"""
+    return FileResponse("docs-data.json", media_type="application/json")
 
 @app.get("/", response_class=HTMLResponse)
 def home():
@@ -18,7 +28,7 @@ def home():
     <!DOCTYPE html>
     <html>
     <head>
-        <title>API AI Tester V7</title>
+        <title>API AI Tester</title>
         <style>
             * {
                 margin: 0;
@@ -525,7 +535,7 @@ def home():
         
         <div class="container">
             <div class="header">
-                <h1>🚀 API AI Tester V7</h1>
+                <h1>🚀 API AI Tester</h1>
                 <p>Intelligent API Testing Framework with AI-Powered Test Generation</p>
             </div>
             
@@ -629,18 +639,30 @@ async def run(
     print("API TEST EXECUTION PIPELINE STARTED", flush=True)
     print("="*70, flush=True)
     
-    tests_file = "test_cases.json"
+    # Create testcases folder if it doesn't exist
+    testcases_folder = "testcases"
+    os.makedirs(testcases_folder, exist_ok=True)
     
     # Check if user wants to reuse existing tests
-    if reuse_tests == "true" and os.path.exists(tests_file):
-        print(f"\n[STEP 1/4] Reusing existing test cases from {tests_file}", flush=True)
-        with open(tests_file, "r") as f:
-            tests = json.load(f)
-        print(f"✓ Loaded {len(tests)} test cases from file", flush=True)
-        timings['test_generation'] = 0
-        timings['swagger_load'] = 0
-        generation_method = "Reused Existing Tests"
-    else:
+    if reuse_tests == "true":
+        # Find the latest test case file
+        test_files = [f for f in os.listdir(testcases_folder) if f.startswith("test_cases_") and f.endswith(".json")]
+        if test_files:
+            # Sort by filename (timestamp) to get the latest
+            latest_test_file = sorted(test_files)[-1]
+            tests_file_path = os.path.join(testcases_folder, latest_test_file)
+            print(f"\n[STEP 1/4] Reusing existing test cases from {latest_test_file}", flush=True)
+            with open(tests_file_path, "r", encoding="utf-8") as f:
+                tests = json.load(f)
+            print(f"✓ Loaded {len(tests)} test cases from file", flush=True)
+            timings['test_generation'] = 0
+            timings['swagger_load'] = 0
+            generation_method = "Reused Existing Tests"
+        else:
+            print(f"\n[STEP 1/4] No existing test cases found, will generate new tests", flush=True)
+            reuse_tests = "false"  # Force generation
+    
+    if reuse_tests != "true":
         # Step 1: Load Swagger specification
         print(f"\n[STEP 1/4] Loading Swagger specification...", flush=True)
         print(f"  Source: {swagger}", flush=True)
@@ -665,10 +687,13 @@ async def run(
         timings['test_generation'] = time.time() - step_start
         print(f"✓ Generated {len(tests)} test cases ({timings['test_generation']:.2f}s)", flush=True)
         
-        # Save generated tests for future reuse
-        with open(tests_file, "w") as f:
+        # Save generated tests with timestamp for future reuse
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        tests_file = f"test_cases_{timestamp}.json"
+        tests_file_path = os.path.join(testcases_folder, tests_file)
+        with open(tests_file_path, "w", encoding="utf-8") as f:
             json.dump(tests, f, indent=2)
-        print(f"  Saved to: {tests_file}", flush=True)
+        print(f"  Saved to: {tests_file_path}", flush=True)
 
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     

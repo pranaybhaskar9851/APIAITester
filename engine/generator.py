@@ -21,6 +21,9 @@ def generate_tests(swagger: dict, login_endpoint=None):
         for method in methods:
             if method.lower() not in ["get", "post", "put", "delete", "patch"]:
                 continue
+            
+            # Keep all methods now that we have smart ID discovery and reuse
+            # GET tests will run first to discover IDs, then POST/PUT/DELETE will use them
 
             endpoint = path
             while "{" in endpoint:
@@ -51,11 +54,11 @@ def generate_tests(swagger: dict, login_endpoint=None):
                         elif param_schema.get("type") == "number":
                             param_value = "10"
                         elif param_schema.get("type") == "string":
-                            # Only add string params if they're required
-                            if is_required:
-                                param_value = ""
+                            # Add value for string params (both required and optional)
+                            if "enum" in param_schema and param_schema["enum"]:
+                                param_value = param_schema["enum"][0]
                             else:
-                                continue  # Skip optional string params
+                                param_value = "available"  # Default string value
                         else:
                             continue  # Skip unknown types
                         
@@ -72,60 +75,20 @@ def generate_tests(swagger: dict, login_endpoint=None):
                 if schema:
                     request_body = generate_sample_data(swagger, schema)
 
-            # Create positive test
-            expected_status = 201 if method.lower() == 'post' else 200
-            test_case = {
-                "id": f"test{test_counter:03d}",
-                "test_name": f"{method.upper()} {path} - Valid Request",
-                "method": method.upper(),
-                "endpoint": endpoint,
-                "expected_status": expected_status,
-                "auth": "valid",
-                "headers": {
-                    "accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Locale": "en_US"
-                }
-            }
-            if request_body:
-                test_case["body"] = request_body
+            # For POST and PUT, create 2 positive test scenarios
+            # For other methods, create 1 positive test
+            num_positive_tests = 2 if method.lower() in ['post', 'put'] else 1
             
-            tests.append(test_case)
-            test_counter += 1
-
-            # Create negative test based on method type
-            if method.lower() == 'get':
-                # For GET: test unauthorized access
-                negative_test = {
+            for i in range(num_positive_tests):
+                expected_status = 201 if method.lower() == 'post' else 200
+                test_name_suffix = f"Valid Request {i+1}" if num_positive_tests > 1 else "Valid Request"
+                
+                test_case = {
                     "id": f"test{test_counter:03d}",
-                    "test_name": f"{method.upper()} {path} - Unauthorized",
+                    "test_name": f"{method.upper()} {path} - {test_name_suffix}",
                     "method": method.upper(),
                     "endpoint": endpoint,
-                    "expected_status": 401,
-                    "auth": "invalid",
-                    "headers": {
-                        "accept": "application/json",
-                        "Content-Type": "application/json",
-                        "Locale": "en_US"
-                    }
-                }
-            else:
-                # For POST/PUT/DELETE/PATCH: test with invalid/non-existent resource
-                invalid_endpoint = endpoint
-                # Replace path parameters with non-existent IDs
-                if "{" in path:
-                    # Use 999999 for non-existent resource
-                    invalid_endpoint = endpoint.replace("/1", "/999999")
-                else:
-                    # For endpoints without params, use invalid data in body
-                    invalid_endpoint = endpoint
-                
-                negative_test = {
-                    "id": f"test{test_counter:03d}",
-                    "test_name": f"{method.upper()} {path} - Invalid Input",
-                    "method": method.upper(),
-                    "endpoint": invalid_endpoint,
-                    "expected_status": 404 if method.lower() in ['put', 'delete'] else 400,
+                    "expected_status": expected_status,
                     "auth": "valid",
                     "headers": {
                         "accept": "application/json",
@@ -133,20 +96,116 @@ def generate_tests(swagger: dict, login_endpoint=None):
                         "Locale": "en_US"
                     }
                 }
+                if request_body:
+                    test_case["body"] = request_body
                 
-                # Add invalid body for POST/PUT/PATCH
-                if request_body and method.lower() in ['post', 'put', 'patch']:
-                    import random
-                    invalid_body = request_body.copy() if isinstance(request_body, dict) else request_body
-                    # Make the body invalid by setting required fields to invalid values
-                    if isinstance(invalid_body, dict):
-                        if 'id' in invalid_body:
-                            invalid_body['id'] = random.randint(100000, 9999999)  # Random non-existent ID
-                        if 'name' in invalid_body:
-                            invalid_body['name'] = ""  # Empty name (often invalid)
-                    negative_test["body"] = invalid_body
-            
-            tests.append(negative_test)
-            test_counter += 1
+                tests.append(test_case)
+                test_counter += 1
+
+            # Create negative test based on method type
+            if method.lower() == 'get':
+                # For GET: test unauthorized access
+                # Many public APIs don't enforce auth, so we expect 200
+                negative_test = {
+                    "id": f"test{test_counter:03d}",
+                    "test_name": f"{method.upper()} {path} - Unauthorized",
+                    "method": method.upper(),
+                    "endpoint": endpoint,
+                    "expected_status": 200,  # Public API - expect 200 since no auth enforcement
+                    "auth": "invalid",
+                    "headers": {
+                        "accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Locale": "en_US"
+                    }
+                }
+                tests.append(negative_test)
+                test_counter += 1
+                
+            elif method.lower() == 'post':
+                # For POST: test with invalid/missing required fields
+                negative_endpoint = endpoint
+                negative_test = {
+                    "id": f"test{test_counter:03d}",
+                    "test_name": f"{method.upper()} {path} - Invalid Body",
+                    "method": method.upper(),
+                    "endpoint": negative_endpoint,
+                    "expected_status": 400,  # Bad request
+                    "auth": "valid",
+                    "headers": {
+                        "accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Locale": "en_US"
+                    },
+                    "body": {}  # Empty body to trigger validation error
+                }
+                tests.append(negative_test)
+                test_counter += 1
+                
+            elif method.lower() in ['put', 'patch']:
+                # For PUT/PATCH: test with non-existent ID
+                negative_endpoint = endpoint.replace("/1", "/999999")
+                if "{" not in path:  # Only if path doesn't have parameters
+                    negative_endpoint = endpoint.replace("/1", "/999999")
+                else:
+                    # Replace the ID in original path
+                    negative_endpoint = path
+                    while "{" in negative_endpoint:
+                        start = negative_endpoint.index("{")
+                        end = negative_endpoint.index("}")
+                        negative_endpoint = negative_endpoint[:start] + "999999" + negative_endpoint[end+1:]
+                    # Add query params if original had them
+                    if "?" in endpoint:
+                        negative_endpoint += "?" + endpoint.split("?")[1]
+                
+                negative_test = {
+                    "id": f"test{test_counter:03d}",
+                    "test_name": f"{method.upper()} {path} - Invalid ID",
+                    "method": method.upper(),
+                    "endpoint": negative_endpoint,
+                    "expected_status": 404,  # Not found
+                    "auth": "valid",
+                    "headers": {
+                        "accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Locale": "en_US"
+                    }
+                }
+                if request_body:
+                    negative_test["body"] = request_body
+                tests.append(negative_test)
+                test_counter += 1
+                
+            elif method.lower() == 'delete':
+                # For DELETE: test with non-existent ID
+                negative_endpoint = endpoint.replace("/1", "/999999")
+                if "{" not in path:  # Only if path doesn't have parameters
+                    negative_endpoint = endpoint.replace("/1", "/999999")
+                else:
+                    # Replace the ID in original path
+                    negative_endpoint = path
+                    while "{" in negative_endpoint:
+                        start = negative_endpoint.index("{")
+                        end = negative_endpoint.index("}")
+                        negative_endpoint = negative_endpoint[:start] + "999999" + negative_endpoint[end+1:]
+                    # Add query params if original had them
+                    if "?" in endpoint:
+                        negative_endpoint += "?" + endpoint.split("?")[1]
+                
+                negative_test = {
+                    "id": f"test{test_counter:03d}",
+                    "test_name": f"{method.upper()} {path} - Invalid ID",
+                    "method": method.upper(),
+                    "endpoint": negative_endpoint,
+                    "expected_status": 404,  # Not found
+                    "auth": "valid",
+                    "headers": {
+                        "accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Locale": "en_US"
+                    }
+                }
+                tests.append(negative_test)
+                test_counter += 1
 
     return tests
