@@ -153,7 +153,8 @@ def home():
                 margin-bottom: 15px;
             }
             
-            input[type="checkbox"] {
+            input[type="checkbox"],
+            input[type="radio"] {
                 width: 20px;
                 height: 20px;
                 margin-right: 10px;
@@ -498,6 +499,39 @@ def home():
                     overlay.classList.remove('active');
                 }
             }
+            
+            // Enable/disable LLM options based on test mode selection
+            document.addEventListener('DOMContentLoaded', function() {
+                const ruleMode = document.getElementById('rule_mode');
+                const aiMode = document.getElementById('ai_mode');
+                const llmOptions = document.getElementById('llm_options');
+                const llmModel = document.getElementById('llm_model');
+                
+                function updateLLMOptions() {
+                    if (aiMode && aiMode.checked) {
+                        // Enable AI mode
+                        llmOptions.style.opacity = '1';
+                        llmOptions.style.pointerEvents = 'auto';
+                        llmModel.disabled = false;
+                        llmModel.style.background = 'white';
+                        llmModel.style.cursor = 'pointer';
+                    } else {
+                        // Disable AI mode (Rule-based selected)
+                        llmOptions.style.opacity = '0.5';
+                        llmOptions.style.pointerEvents = 'none';
+                        llmModel.disabled = true;
+                        llmModel.style.background = '#f5f5f5';
+                        llmModel.style.cursor = 'not-allowed';
+                    }
+                }
+                
+                // Listen for changes
+                if (ruleMode) ruleMode.addEventListener('change', updateLLMOptions);
+                if (aiMode) aiMode.addEventListener('change', updateLLMOptions);
+                
+                // Initialize on page load
+                updateLLMOptions();
+            });
         </script>
     </head>
     <body>
@@ -573,16 +607,34 @@ def home():
                     <div class="section">
                         <div class="section-title">Test Generation Options</div>
                         
-                        <div class="checkbox-group">
-                            <input type="checkbox" name="use_llm" value="true" id="use_llm"/>
-                            <label for="use_llm" class="checkbox-label">
-                                🤖 Use AI (Ollama) for intelligent test generation
-                            </label>
+                        <!-- Strategy Info Box -->
+                        <div class="info-box" style="background: #e8f5e9; border-left-color: #4caf50; color: #2e7d32; margin-bottom: 20px;">
+                            <strong>📋 Choose Your Test Generation Strategy:</strong><br>
+                            • <strong>Rule-Based:</strong> Fast, deterministic testing for standard CRUD APIs. Best for simple REST APIs with predictable patterns.<br>
+                            • <strong>AI-Powered:</strong> Intelligent, context-aware test generation for complex APIs. Generates smarter scenarios, realistic data, and edge cases.
                         </div>
                         
-                        <div class="form-group">
+                        <!-- Radio Button Selection -->
+                        <div style="margin-bottom: 20px;">
+                            <div class="checkbox-group" style="margin-bottom: 10px;">
+                                <input type="radio" name="test_mode" value="rule" id="rule_mode" checked/>
+                                <label for="rule_mode" class="checkbox-label">
+                                    ⚙️ <strong>Rule-Based Generation</strong> <span style="color: #999; font-size: 12px;">(Fast, deterministic, no dependencies)</span>
+                                </label>
+                            </div>
+                            
+                            <div class="checkbox-group">
+                                <input type="radio" name="test_mode" value="ai" id="ai_mode"/>
+                                <label for="ai_mode" class="checkbox-label">
+                                    🤖 <strong>AI-Powered Generation</strong> <span style="color: #999; font-size: 12px;">(Intelligent, context-aware, requires Ollama)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- LLM Model Selection (disabled by default) -->
+                        <div class="form-group" id="llm_options" style="opacity: 0.5; pointer-events: none; transition: all 0.3s;">
                             <label>LLM Model <span class="label-help">(select a lightweight model)</span></label>
-                            <select name="llm_model" style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; transition: all 0.3s; background: white; cursor: pointer;">
+                            <select name="llm_model" id="llm_model" disabled style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; transition: all 0.3s; background: #f5f5f5; cursor: not-allowed;">
                                 <option value="qwen2.5:0.5b">🐉 Qwen 2.5 0.5B (Ultra-light - 400MB)</option>
                                 <option value="tinyllama:latest">🦙 TinyLlama Latest (Ultra-light - 637MB)</option>
                                 <option value="llama3.2:1b" selected>🦙 Llama 3.2 1B (Fastest - 1.3GB)</option>
@@ -590,10 +642,10 @@ def home():
                                 <option value="llama3:8b">🦙 Llama 3 8B (Powerful - 4.7GB)</option>
                                 <option value="phi3:mini">🔬 Phi 3 Mini (Efficient - 2.3GB)</option>
                             </select>
-                        </div>
-                        
-                        <div class="info-box" style="background: #fff3e0; border-left-color: #ff9800; color: #e65100;">
-                            💡 <strong>Tip:</strong> First run generates and saves tests. Next runs can reuse them for faster execution. Install models with: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">ollama pull [model]</code>
+                            
+                            <div class="info-box" style="background: #fff3e0; border-left-color: #ff9800; color: #e65100; margin-top: 10px;">
+                                💡 <strong>Setup Required:</strong> Install Ollama and pull a model: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px;">ollama pull llama3.2:1b</code>
+                            </div>
                         </div>
                         
                         <div class="checkbox-group">
@@ -623,8 +675,8 @@ async def run(
     swagger: str = Form(...),
     api_key: str = Form(""),
     reuse_tests: str = Form(""),
-    use_llm: str = Form(""),
-    llm_model: str = Form("llama3.2")
+    test_mode: str = Form("rule"),
+    llm_model: str = Form("llama3.2:1b")
 ):
     import os
     import json
@@ -677,14 +729,14 @@ async def run(
         print(f"✓ Swagger loaded successfully ({timings['swagger_load']:.2f}s)", flush=True)
         print(f"  Found {len(spec.get('paths', {}))} endpoints", flush=True)
         
-        # Step 2: Generate tests
+        # Step 2: Generate tests based on selected mode
         print(f"\n[STEP 2/4] Generating test cases...", flush=True)
         step_start = time.time()
-        if use_llm == "true":
-            print(f"  Method: LLM-based generation", flush=True)
+        if test_mode == "ai":
+            print(f"  Method: AI-Powered generation", flush=True)
             print(f"  Model: {llm_model}", flush=True)
             tests = generate_tests_with_llm(spec, None, llm_model)
-            generation_method = f"LLM-based ({llm_model})"
+            generation_method = f"AI-Powered ({llm_model})"
         else:
             print(f"  Method: Rule-based generation", flush=True)
             tests = generate_tests(spec, None)
@@ -721,7 +773,7 @@ async def run(
     metadata = {
         'timings': timings,
         'generation_method': generation_method,
-        'llm_model': llm_model if use_llm == "true" else None,
+        'llm_model': llm_model if test_mode == "ai" else None,
         'base_url': base_url,
         'total_tests': len(tests)
     }
