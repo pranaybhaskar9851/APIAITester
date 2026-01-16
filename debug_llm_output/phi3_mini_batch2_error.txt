@@ -1,0 +1,337 @@
+=== ORIGINAL OUTPUT ===
+[
+  {
+    "id": "test001",
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "GET /products - Unauthorized",
+    "method": "GET",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /products - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /products - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "POST /products - Invalid Body",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 400,
+    "auth": "valid",
+    "body": {}
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "PUT /products - Valid Request 1",
+    "method": "PUT",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "PUT /products - Valid Request 2",
+    "method": "PUT",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "PUT /products - Invalid ID",
+    "method": "PUT",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test009",
+    "test_name": "DELETE /products - Valid Request",
+    "method": "DELETE",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test010",
+    "test_name": "DELETE /products - Invalid ID",
+    "method": "DELETE",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+}
+
+
+=== EXTRACTED JSON ===
+[
+  {
+    "id": "test001",
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "GET /products - Unauthorized",
+    "method": "GET",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /products - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /products - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "POST /products - Invalid Body",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 400,
+    "auth": "valid",
+    "body": {}
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "PUT /products - Valid Request 1",
+    "method": "PUT",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "PUT /products - Valid Request 2",
+    "method": "PUT",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "PUT /products - Invalid ID",
+    "method": "PUT",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test009",
+    "test_name": "DELETE /products - Valid Request",
+    "method": "DELETE",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test010",
+    "test_name": "DELETE /products - Invalid ID",
+    "method": "DELETE",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+}
+
+=== ERROR ===
+Expecting ',' delimiter: line 74 column 5 (char 1671)

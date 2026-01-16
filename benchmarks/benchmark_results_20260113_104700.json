@@ -1,0 +1,56 @@
+[
+  {
+    "model": "qwen2.5:0.5b",
+    "status": "SUCCESS",
+    "total_time": 480.82043433189392,
+    "tests_generated": 34,
+    "tests_passed": 12,
+    "tests_failed": 22,
+    "error": null
+  },
+  {
+    "model": "tinyllama:latest",
+    "status": "SUCCESS",
+    "total_time": 161.59254598617554,
+    "tests_generated": 8,
+    "tests_passed": 6,
+    "tests_failed": 2,
+    "error": null
+  },
+  {
+    "model": "llama3.2:1b",
+    "status": "SUCCESS",
+    "total_time": 174.2510633468628,
+    "tests_generated": 18,
+    "tests_passed": 15,
+    "tests_failed": 3,
+    "error": null
+  },
+  {
+    "model": "gemma3:1b",
+    "status": "SUCCESS",
+    "total_time": 187.23893928527832,
+    "tests_generated": 34,
+    "tests_passed": 28,
+    "tests_failed": 6,
+    "error": null
+  },
+  {
+    "model": "llama3:8b",
+    "status": "SUCCESS",
+    "total_time": 535.7693793773651,
+    "tests_generated": 38,
+    "tests_passed": 25,
+    "tests_failed": 13,
+    "error": null
+  },
+  {
+    "model": "phi3:mini",
+    "status": "SUCCESS",
+    "total_time": 1244.75,
+    "tests_generated": 14,
+    "tests_passed": 9,
+    "tests_failed": 5,
+    "error": null
+  }
+]

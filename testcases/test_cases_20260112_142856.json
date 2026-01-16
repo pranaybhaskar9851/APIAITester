@@ -1,0 +1,37 @@
+[
+  {
+    "id": "test001",
+    "test_name": "POST /auth/login",
+    "method": "POST",
+    "endpoint": "/auth/login",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "GET /products/1 - POST",
+    "method": "GET",
+    "endpoint": "/products/1 - POST",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {}
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /auth/login",
+    "method": "POST",
+    "endpoint": "/auth/login",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  }
+]

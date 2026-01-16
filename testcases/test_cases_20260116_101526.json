@@ -1,0 +1,93 @@
+[
+  {
+    "id": "test001",
+    "test_name": "GET /users/1",
+    "method": "GET",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "PUT /users/1",
+    "method": "PUT",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "DELETE /users/1",
+    "method": "DELETE",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "GET /users/999999",
+    "method": "GET",
+    "endpoint": "/users/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "PUT /users/999999",
+    "method": "PUT",
+    "endpoint": "/users/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "DELETE /users/999999",
+    "method": "DELETE",
+    "endpoint": "/users/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "GET /products",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  }
+]

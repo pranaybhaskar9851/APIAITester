@@ -1,8 +1,8 @@
 [
   {
     "id": "test001",
-    "test_name": "GET /products - Valid Request",
-    "method": "GET",
+    "test_name": "GET /products - Valid Request + Unauthorized",
+    "method": "GET /PRODUCTS",
     "endpoint": "/products",
     "expected_status": 200,
     "auth": "valid",
@@ -14,23 +14,30 @@
   },
   {
     "id": "test002",
-    "test_name": "GET /products - Unauthorized",
-    "method": "GET",
+    "test_name": "POST /products - Valid Request 1 + Valid Request 2 + Invalid Body",
+    "method": "POST /PRODUCTS",
     "endpoint": "/products",
-    "expected_status": 200,
-    "auth": "invalid",
+    "expected_status": 201,
+    "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
+    },
+    "body": {
+      "id": 999999,
+      "title": "Test Product",
+      "price": 10.0,
+      "description": "Description of the product",
+      "category": "Electronics"
     }
   },
   {
     "id": "test003",
-    "test_name": "POST /products - Valid Request 1",
-    "method": "POST",
+    "test_name": "PUT /products - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PUT /PRODUCTS",
     "endpoint": "/products",
-    "expected_status": 201,
+    "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -38,19 +45,19 @@
       "Locale": "en_US"
     },
     "body": {
-      "id": 10,
-      "title": "string",
-      "price": 0.0,
-      "description": "string",
-      "category": "string"
+      "id": 1,
+      "title": "Updated Product",
+      "price": 5.0,
+      "description": "Updated description of the product",
+      "category": "Electronics"
     }
   },
   {
     "id": "test004",
-    "test_name": "POST /products - Valid Request 2",
-    "method": "POST",
+    "test_name": "DELETE /products - Valid Request + Invalid ID",
+    "method": "DELETE /PRODUCTS",
     "endpoint": "/products",
-    "expected_status": 201,
+    "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -58,17 +65,13 @@
       "Locale": "en_US"
     },
     "body": {
-      "id": 10,
-      "title": "string",
-      "price": 0.0,
-      "description": "string",
-      "category": "string"
+      "id": "1"
     }
   },
   {
     "id": "test005",
-    "test_name": "POST /products - Invalid Body",
-    "method": "POST",
+    "test_name": "POST /products - Valid Request 1 + Valid Request 2 + Invalid Body",
+    "method": "POST /PRODUCTS",
     "endpoint": "/products",
     "expected_status": 400,
     "auth": "valid",
@@ -77,14 +80,20 @@
       "Content-Type": "application/json",
       "Locale": "en_US"
     },
-    "body": {}
+    "body": {
+      "id": 1,
+      "title": "Test Product",
+      "price": 0.0,
+      "description": "Description of the product",
+      "category": "Electronics"
+    }
   },
   {
     "id": "test006",
-    "test_name": "GET /products/{id} - Valid Request",
-    "method": "GET",
-    "endpoint": "/products/1",
-    "expected_status": 200,
+    "test_name": "GET /products/{id} - Valid Request + Unauthorized",
+    "method": "GET /PRODUCTS/{ID}",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -94,11 +103,11 @@
   },
   {
     "id": "test007",
-    "test_name": "GET /products/{id} - Unauthorized",
-    "method": "GET",
-    "endpoint": "/products/1",
-    "expected_status": 200,
-    "auth": "invalid",
+    "test_name": "POST /products/{id} - Valid Request 1 + Valid Request 2 + Invalid Body",
+    "method": "POST /PRODUCTS/{ID}",
+    "endpoint": "/products/999999",
+    "expected_status": 400,
+    "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
@@ -107,48 +116,21 @@
   },
   {
     "id": "test008",
-    "test_name": "PUT /products/{id} - Valid Request 1",
-    "method": "PUT",
-    "endpoint": "/products/1",
-    "expected_status": 200,
+    "test_name": "PUT /products/{id} - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PUT /PRODUCTS/{ID}",
+    "endpoint": "/products/999999",
+    "expected_status": 400,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "title": "string",
-      "price": 0.0,
-      "description": "string",
-      "category": "string"
     }
   },
   {
     "id": "test009",
-    "test_name": "PUT /products/{id} - Valid Request 2",
-    "method": "PUT",
-    "endpoint": "/products/1",
-    "expected_status": 200,
-    "auth": "valid",
-    "headers": {
-      "accept": "application/json",
-      "Content-Type": "application/json",
-      "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "title": "string",
-      "price": 0.0,
-      "description": "string",
-      "category": "string"
-    }
-  },
-  {
-    "id": "test010",
-    "test_name": "PUT /products/{id} - Invalid ID",
-    "method": "PUT",
+    "test_name": "DELETE /products/{id} - Valid Request + Invalid ID",
+    "method": "DELETE /PRODUCTS/{ID}",
     "endpoint": "/products/999999",
     "expected_status": 404,
     "auth": "valid",
@@ -156,21 +138,27 @@
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "title": "string",
-      "price": 0.0,
-      "description": "string",
-      "category": "string"
+    }
+  },
+  {
+    "id": "test010",
+    "test_name": "POST /products/{id} - Valid Request 1 + Valid Request 2 + Invalid Body",
+    "method": "POST /PRODUCTS/{ID}",
+    "endpoint": "/products/999999",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
     }
   },
   {
     "id": "test011",
-    "test_name": "DELETE /products/{id} - Valid Request",
-    "method": "DELETE",
-    "endpoint": "/products/1",
-    "expected_status": 200,
+    "test_name": "PATCH /products/{id} - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PATCH /PRODUCTS/{ID}",
+    "endpoint": "/products/999999",
+    "expected_status": 400,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -180,10 +168,10 @@
   },
   {
     "id": "test012",
-    "test_name": "DELETE /products/{id} - Invalid ID",
-    "method": "DELETE",
+    "test_name": "PUT /products/{id} - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PUT /PRODUCTS/{ID}",
     "endpoint": "/products/999999",
-    "expected_status": 404,
+    "expected_status": 400,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -193,8 +181,8 @@
   },
   {
     "id": "test013",
-    "test_name": "GET /carts - Valid Request",
-    "method": "GET",
+    "test_name": "GET /carts - Valid Request + Unauthorized",
+    "method": "GET /CARTS",
     "endpoint": "/carts",
     "expected_status": 200,
     "auth": "valid",
@@ -206,73 +194,64 @@
   },
   {
     "id": "test014",
-    "test_name": "GET /carts - Unauthorized",
-    "method": "GET",
+    "test_name": "POST /carts - Valid Request 1 + Valid Request 2 + Invalid Body",
+    "method": "POST /CARTS",
     "endpoint": "/carts",
-    "expected_status": 200,
-    "auth": "invalid",
+    "expected_status": 201,
+    "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    }
+    },
+    "body": "{\"id\": 1,\"userId\": 1,\"products\":[\"apple\", \"banana\"]}"
   },
   {
     "id": "test015",
-    "test_name": "POST /carts - Valid Request 1",
-    "method": "POST",
+    "test_name": "PUT /carts - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PUT /CARTS",
     "endpoint": "/carts",
-    "expected_status": 201,
+    "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
     },
-    "body": {
-      "id": 10,
-      "userId": 10,
-      "products": []
-    }
+    "body": "{\"id\": 1,\"userId\": 1,\"products\":[\"apple\", \"banana\"]}"
   },
   {
     "id": "test016",
-    "test_name": "POST /carts - Valid Request 2",
-    "method": "POST",
+    "test_name": "DELETE /carts - Valid Request + Invalid ID",
+    "method": "DELETE /CARTS",
     "endpoint": "/carts",
-    "expected_status": 201,
+    "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "userId": 10,
-      "products": []
     }
   },
   {
     "id": "test017",
-    "test_name": "POST /carts - Invalid Body",
-    "method": "POST",
-    "endpoint": "/carts",
-    "expected_status": 400,
+    "test_name": "GET /carts/{id}",
+    "method": "GET",
+    "endpoint": "/carts/146993",
+    "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {}
+    }
   },
   {
     "id": "test018",
-    "test_name": "GET /carts/{id} - Valid Request",
-    "method": "GET",
-    "endpoint": "/carts/1",
-    "expected_status": 200,
+    "test_name": "POST /carts/{id}",
+    "method": "POST",
+    "endpoint": "/carts/381441",
+    "expected_status": 201,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -282,11 +261,11 @@
   },
   {
     "id": "test019",
-    "test_name": "GET /carts/{id} - Unauthorized",
-    "method": "GET",
-    "endpoint": "/carts/1",
-    "expected_status": 200,
-    "auth": "invalid",
+    "test_name": "PUT /carts/{id}",
+    "method": "PUT",
+    "endpoint": "/carts/751410",
+    "expected_status": 201,
+    "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
@@ -295,63 +274,48 @@
   },
   {
     "id": "test020",
-    "test_name": "PUT /carts/{id} - Valid Request 1",
-    "method": "PUT",
-    "endpoint": "/carts/1",
+    "test_name": "DELETE /carts/{id}",
+    "method": "DELETE",
+    "endpoint": "/carts/518333",
     "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "userId": 10,
-      "products": []
     }
   },
   {
     "id": "test021",
-    "test_name": "PUT /carts/{id} - Valid Request 2",
-    "method": "PUT",
-    "endpoint": "/carts/1",
+    "test_name": "POST /carts/{id}",
+    "method": "POST",
+    "endpoint": "/carts/609404",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test022",
+    "test_name": "PATCH /carts/{id}",
+    "method": "PATCH",
+    "endpoint": "/carts/554192",
     "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "userId": 10,
-      "products": []
-    }
-  },
-  {
-    "id": "test022",
-    "test_name": "PUT /carts/{id} - Invalid ID",
-    "method": "PUT",
-    "endpoint": "/carts/999999",
-    "expected_status": 404,
-    "auth": "valid",
-    "headers": {
-      "accept": "application/json",
-      "Content-Type": "application/json",
-      "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "userId": 10,
-      "products": []
     }
   },
   {
     "id": "test023",
-    "test_name": "DELETE /carts/{id} - Valid Request",
+    "test_name": "DELETE /carts/{id}",
     "method": "DELETE",
-    "endpoint": "/carts/1",
+    "endpoint": "/carts/177023",
     "expected_status": 200,
     "auth": "valid",
     "headers": {
@@ -362,10 +326,10 @@
   },
   {
     "id": "test024",
-    "test_name": "DELETE /carts/{id} - Invalid ID",
-    "method": "DELETE",
-    "endpoint": "/carts/999999",
-    "expected_status": 404,
+    "test_name": "GET /users - Valid Request + Unauthorized",
+    "method": "GET /USERS",
+    "endpoint": "/users",
+    "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -375,55 +339,61 @@
   },
   {
     "id": "test025",
-    "test_name": "GET /users - Valid Request",
-    "method": "GET",
+    "test_name": "POST /users - Valid Request 1 + Valid Request 2 + Invalid Body",
+    "method": "POST /USERS",
     "endpoint": "/users",
-    "expected_status": 200,
+    "expected_status": 201,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
+    },
+    "body": {
+      "id": 1,
+      "username": "test_user",
+      "email": "user@example.com",
+      "password": "test_password"
     }
   },
   {
     "id": "test026",
-    "test_name": "GET /users - Unauthorized",
-    "method": "GET",
-    "endpoint": "/users",
-    "expected_status": 200,
-    "auth": "invalid",
+    "test_name": "PUT /users - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PUT /USERS",
+    "endpoint": "/users/999999",
+    "expected_status": 404,
+    "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
+    },
+    "body": {
+      "id": 1,
+      "username": "test_user",
+      "email": "user@example.com",
+      "password": "test_password"
     }
   },
   {
     "id": "test027",
-    "test_name": "POST /users - Valid Request 1",
-    "method": "POST",
-    "endpoint": "/users",
-    "expected_status": 201,
+    "test_name": "DELETE /users - Valid Request + Invalid ID",
+    "method": "DELETE /USERS",
+    "endpoint": "/users/1",
+    "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "username": "string",
-      "email": "string",
-      "password": "string"
     }
   },
   {
     "id": "test028",
-    "test_name": "POST /users - Valid Request 2",
-    "method": "POST",
-    "endpoint": "/users",
-    "expected_status": 201,
+    "test_name": "PATCH /users - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PATCH /USERS",
+    "endpoint": "/users/999999",
+    "expected_status": 404,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -431,32 +401,31 @@
       "Locale": "en_US"
     },
     "body": {
-      "id": 10,
-      "username": "string",
-      "email": "string",
-      "password": "string"
+      "id": 1,
+      "username": "test_user",
+      "email": "user@example.com",
+      "password": "test_password"
     }
   },
   {
     "id": "test029",
-    "test_name": "POST /users - Invalid Body",
-    "method": "POST",
-    "endpoint": "/users",
-    "expected_status": 400,
+    "test_name": "GET /users/{id} - Valid Request + Unauthorized",
+    "method": "GET /USERS/{ID}",
+    "endpoint": "/users/999999",
+    "expected_status": 404,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {}
+    }
   },
   {
     "id": "test030",
-    "test_name": "GET /users/{id} - Valid Request",
-    "method": "GET",
-    "endpoint": "/users/1",
-    "expected_status": 200,
+    "test_name": "POST /users/{id} - Valid Request 1 + Valid Request 2 + Invalid Body",
+    "method": "POST /USERS/{ID}",
+    "endpoint": "/users/999999",
+    "expected_status": 400,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -466,11 +435,11 @@
   },
   {
     "id": "test031",
-    "test_name": "GET /users/{id} - Unauthorized",
-    "method": "GET",
-    "endpoint": "/users/1",
-    "expected_status": 200,
-    "auth": "invalid",
+    "test_name": "PUT /users/{id} - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PUT /USERS/{ID}",
+    "endpoint": "/users/999999",
+    "expected_status": 400,
+    "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
@@ -479,46 +448,8 @@
   },
   {
     "id": "test032",
-    "test_name": "PUT /users/{id} - Valid Request 1",
-    "method": "PUT",
-    "endpoint": "/users/1",
-    "expected_status": 200,
-    "auth": "valid",
-    "headers": {
-      "accept": "application/json",
-      "Content-Type": "application/json",
-      "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "username": "string",
-      "email": "string",
-      "password": "string"
-    }
-  },
-  {
-    "id": "test033",
-    "test_name": "PUT /users/{id} - Valid Request 2",
-    "method": "PUT",
-    "endpoint": "/users/1",
-    "expected_status": 200,
-    "auth": "valid",
-    "headers": {
-      "accept": "application/json",
-      "Content-Type": "application/json",
-      "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "username": "string",
-      "email": "string",
-      "password": "string"
-    }
-  },
-  {
-    "id": "test034",
-    "test_name": "PUT /users/{id} - Invalid ID",
-    "method": "PUT",
+    "test_name": "DELETE /users/{id} - Valid Request + Invalid ID",
+    "method": "DELETE /USERS/{ID}",
     "endpoint": "/users/999999",
     "expected_status": 404,
     "auth": "valid",
@@ -526,20 +457,40 @@
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {
-      "id": 10,
-      "username": "string",
-      "email": "string",
-      "password": "string"
+    }
+  },
+  {
+    "id": "test033",
+    "test_name": "POST /users/{id} - Valid Request 1 + Valid Request 2 + Invalid Body",
+    "method": "POST /USERS/{ID}",
+    "endpoint": "/users/999999",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test034",
+    "test_name": "PATCH /users/{id} - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PATCH /USERS/{ID}",
+    "endpoint": "/users/999999",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
     }
   },
   {
     "id": "test035",
-    "test_name": "DELETE /users/{id} - Valid Request",
-    "method": "DELETE",
-    "endpoint": "/users/1",
-    "expected_status": 200,
+    "test_name": "PUT /users/{id} - Valid Request 1 + Valid Request 2 + Invalid ID",
+    "method": "PUT /USERS/{ID}",
+    "endpoint": "/users/999999",
+    "expected_status": 400,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -549,10 +500,10 @@
   },
   {
     "id": "test036",
-    "test_name": "DELETE /users/{id} - Invalid ID",
-    "method": "DELETE",
-    "endpoint": "/users/999999",
-    "expected_status": 404,
+    "test_name": "POST /auth/login - GET",
+    "method": "POST /AUTH/LOGIN",
+    "endpoint": "/auth/login",
+    "expected_status": 200,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
@@ -562,8 +513,8 @@
   },
   {
     "id": "test037",
-    "test_name": "POST /auth/login - Valid Request 1",
-    "method": "POST",
+    "test_name": "POST /auth/login - PUT",
+    "method": "POST /AUTH/LOGIN",
     "endpoint": "/auth/login",
     "expected_status": 201,
     "auth": "valid",
@@ -571,41 +522,19 @@
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {
-      "username": "string",
-      "password": "string"
     }
   },
   {
     "id": "test038",
-    "test_name": "POST /auth/login - Valid Request 2",
-    "method": "POST",
+    "test_name": "POST /auth/login - DELETE",
+    "method": "POST /AUTH/LOGIN",
     "endpoint": "/auth/login",
-    "expected_status": 201,
+    "expected_status": 204,
     "auth": "valid",
     "headers": {
       "accept": "application/json",
       "Content-Type": "application/json",
       "Locale": "en_US"
-    },
-    "body": {
-      "username": "string",
-      "password": "string"
     }
-  },
-  {
-    "id": "test039",
-    "test_name": "POST /auth/login - Invalid Body",
-    "method": "POST",
-    "endpoint": "/auth/login",
-    "expected_status": 400,
-    "auth": "valid",
-    "headers": {
-      "accept": "application/json",
-      "Content-Type": "application/json",
-      "Locale": "en_US"
-    },
-    "body": {}
   }
 ]

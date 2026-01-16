@@ -1,0 +1,61 @@
+=== ORIGINAL OUTPUT ===
+Here are the test cases for the GET, POST, PUT, DELETE, and PATCH methods with valid JSON arrays in the expected format:
+
+1. GET /users:
+   - Valid Request: 2 tests (Valid Request 1 + Valid Request 2)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", NO body
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", NO body
+
+2. POST /users:
+   - Valid Request: 3 tests (Valid Request 1 + Valid Request 2 + Invaliid Body)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", FULL body from examples
+   - Invaliid Body: status 400, auth="valid", body={}
+
+3. PUT /products/{id}:
+   - Valid Request: 3 tests (Valid Request 1 + Valid Request 2 + Invaliid ID)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", FULL body from examples
+   - Invaliid ID: endpoint with {{id}}→10, status 404, auth="valid", NO body
+
+4. POST /products:
+   - Valid Request: 3 tests (Valid Request 1 + Valid Request 2 + Invaliid Body)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", FULL body from examples
+   - Invaliid Body: status 400, auth="valid", body={}
+
+5. PUT /products/{id}:
+   - Valid Request: 3 tests (Valid Request 1 + Valid Request 2 + Invaliid ID)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", FULL body from examples
+   - Invaliid ID: endpoint with {{id}}→10, status 404, auth="valid", NO body
+
+6. POST /products:
+   - Valid Request: 3 tests (Valid Request 1 + Valid Request 2 + Invaliid Body)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", FULL body from examples
+   - Invaliid Body: status 400, auth="valid", body={}
+
+7. PUT /products/{id}:
+   - Valid Request: 3 tests (Valid Request 1 + Valid Request 2 + Invaliid ID)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", FULL body from examples
+   - Invaliid ID: endpoint with {{id}}→10, status 404, auth="valid", NO body
+
+8. POST /products:
+   - Valid Request: 3 tests (Valid Request 1 + Valid Request 2 + Invaliid Body)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", FULL body from examples
+   - Invaliid Body: status 400, auth="valid", body={}
+
+9. PUT /products/{id}:
+   - Valid Request: 3 tests (Valid Request 1 + Valid Request 2 + Invaliid ID)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", FULL body from examples
+   - Invaliid ID: endpoint with {{id}}→10, status 404, auth="valid", NO body
+
+10. POST /products:
+   - Valid Request: 3 tests (Valid Request 1 + Valid Request 2 + Invaliid Body)
+   - Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+   - Valid Request 2: endpoint with {{id}}→999999, status 404, auth="valid", FULL body from examples
+   - Invaliid Body: status 400, auth="valid", body={}

@@ -1,0 +1,106 @@
+[
+  {
+    "id": "test001",
+    "test_name": "GET /carts - GET",
+    "method": "GET",
+    "endpoint": "/carts",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "GET /carts - GET (invalid id)",
+    "method": "GET",
+    "endpoint": "/carts/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /carts - POST (valid request)",
+    "method": "POST",
+    "endpoint": "/carts",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /carts - POST (invalid body)",
+    "method": "POST",
+    "endpoint": "/carts",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "PUT /carts - PUT (valid request)",
+    "method": "PUT",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "POST /auth/login",
+    "method": "POST",
+    "endpoint": "/auth/login",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "GET /products/1 - GET",
+    "method": "GET",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "POST /products - POST",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "test001",
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "LocalE": "en_US"
+    }
+  }
+]

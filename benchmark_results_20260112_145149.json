@@ -1,0 +1,53 @@
+[
+  {
+    "model": "qwen2.5:0.5b",
+    "status": "SUCCESS",
+    "total_time": 50.40476679801941,
+    "tests_generated": 38,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "error": null
+  },
+  {
+    "model": "tinyllama:latest",
+    "status": "SUCCESS",
+    "total_time": 301.796000957489,
+    "tests_generated": 0,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "error": null
+  },
+  {
+    "model": "llama3.2:1b",
+    "status": "SUCCESS",
+    "total_time": 64.05619382858276,
+    "tests_generated": 3,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "error": null
+  },
+  {
+    "model": "gemma3:1b",
+    "status": "SUCCESS",
+    "total_time": 175.19987750053406,
+    "tests_generated": 34,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "error": null
+  },
+  {
+    "model": "llama3:8b",
+    "status": "SUCCESS",
+    "total_time": 575.573047876358,
+    "tests_generated": 38,
+    "tests_passed": 0,
+    "tests_failed": 0,
+    "error": null
+  },
+  {
+    "model": "phi3:mini",
+    "status": "TIMEOUT",
+    "total_time": 600,
+    "error": "Request timed out after 10 minutes"
+  }
+]

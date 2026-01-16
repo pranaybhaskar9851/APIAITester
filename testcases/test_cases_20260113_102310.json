@@ -1,0 +1,116 @@
+[
+  {
+    "id": "test001",
+    "test_name": "GET /users",
+    "method": "GET",
+    "endpoint": "/users",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "POST /users",
+    "method": "POST",
+    "endpoint": "/users",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "test_name": "POST /users"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "PUT /products/517493",
+    "method": "PUT",
+    "endpoint": "/products/517493",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "test_name": "PUT /products/{id}",
+      "description": "Product 10"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "PUT /products",
+    "method": "PUT",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "test_name": "PUT /products"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "PUT /products/10",
+    "method": "PUT",
+    "endpoint": "/products/10",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "<METHOD> <path> - POST /products",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "<METHOD> <path> - PUT /products/{id}",
+    "method": "PUT",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "<METHOD> <path> - DELETE /products/{id}",
+    "method": "DELETE",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  }
+]

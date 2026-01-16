@@ -116,18 +116,14 @@ def generate_html_report(results, path, metadata=None):
             <div class="timing-section">
                 <h3>Execution Timeline</h3>
                 <div class="timing-grid">
-                    {% if timings.swagger_load > 0 %}
                     <div class="timing-card">
                         <label>SWAGGER SPEC LOAD</label>
-                        <div class="time">{{\"%.2f\"|format(timings.swagger_load)}}<span class="unit">sec</span></div>
+                        <div class="time">{{\"%.2f\"|format(timings.get('swagger_load', 0))}}<span class="unit">sec</span></div>
                     </div>
-                    {% endif %}
-                    {% if timings.test_generation > 0 %}
                     <div class="timing-card">
                         <label>TEST GENERATION</label>
-                        <div class="time">{{\"%.2f\"|format(timings.test_generation)}}<span class="unit">sec</span></div>
+                        <div class="time">{{\"%.2f\"|format(timings.get('test_generation', 0))}}<span class="unit">sec</span></div>
                     </div>
-                    {% endif %}
                     <div class="timing-card">
                         <label>TEST EXECUTION</label>
                         <div class="time">{{\"%.2f\"|format(timings.test_execution)}}<span class="unit">sec</span></div>

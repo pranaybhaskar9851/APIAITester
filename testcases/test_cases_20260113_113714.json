@@ -1,0 +1,224 @@
+[
+  {
+    "id": "test001",
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "GET /products - Unauthorized",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /products - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 10,
+      "title": "string",
+      "price": 0.0,
+      "description": "string",
+      "category": "string"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /products - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "POST /products - Invalid Body",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "GET /users/1 - Valid Request",
+    "method": "GET",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "GET /users/1 - Unauthorized",
+    "method": "GET",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "POST /products - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "productName": "Sample Product",
+      "price": 9.99
+    }
+  },
+  {
+    "id": "test009",
+    "test_name": "POST /products - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "productName": "Another Sample Product",
+      "price": 14.99
+    }
+  },
+  {
+    "id": "test010",
+    "test_name": "POST /products - Invalid Body",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test011",
+    "test_name": "PUT /users/1 - Valid Request 1",
+    "method": "PUT",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "username": "updatedUsername",
+      "email": "updatedEmail@example.com"
+    }
+  },
+  {
+    "id": "test012",
+    "test_name": "PUT /users/1 - Valid Request 2",
+    "method": "PUT",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "username": "updatedUsername",
+      "email": "updatedEmail@example.com"
+    }
+  },
+  {
+    "id": "test013",
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test014",
+    "test_name": "GET /products - Unauthorized",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test015",
+    "test_name": "POST /products - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "username": "user1",
+      "password": "pass1"
+    }
+  }
+]

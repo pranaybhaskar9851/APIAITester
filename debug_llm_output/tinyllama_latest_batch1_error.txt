@@ -1,0 +1,92 @@
+=== ORIGINAL OUTPUT ===
+Here are the test cases in valid JSON array format for each method (GET, POST, PUT, DELETE, and PATCH) with their corresponding endpoint paths:
+
+1. GET /products
+2. POST /products
+3. PUT /products/{id}
+4. DELETE /products/{id}
+5. PATCH /products/{id}
+
+Here are the test cases for each method:
+
+GET Method:
+  1. Valid Request 1: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+  2. Valid Request 2: endpoint with {{id}}→1, status 200, auth="valid", FULL body from examples
+  3. Invaliid Body: status 400, auth="valid", body={}
+
+POST Method:
+  1. Valid Request 1: {{id}}→1, status 200, auth="valid", FULL body from examples
+  2. Valid Request 2: {{id}}→1, status 200, auth="valid", FULL body from examples
+  3. Invaliid ID: {{id}}→999999, status 404, auth="valid", FULL body from examples
+
+PUT/PATCH Method:
+  1. Valid Request 1: {{id}}→1, status 200, auth="valid", FULL body from examples
+  2. Valid Request 2: {{id}}→1, status 200, auth="valid", FULL body from examples
+  3. Invaliid ID: {{id}}→999999, status 404, auth="valid", FULL body from examples
+
+DELETE Method:
+  1. Valid Request: {{id}}→1, status 200, auth="valid", NO body
+  2. Invaliid ID: {{id}}→999999, status 404, auth="valid", NO body
+
+Request Body Example (use these for POST/PUT/PATCH):
+{
+   "POST /products": {
+     "id": 10,
+     "title": "string",
+     "price": 0.0,
+     "descripion": "string",
+     "category": "string"
+   }
+}
+
+JSON FORMAT (CRITICAL - Follow exactly):
+{
+   "id": "test001",
+   "test_name": "GET /products - Valid Request",
+   "method": "GET",
+   "endpoint": "/products",
+   "expected_status": 200,
+   "auth": "valid",
+   "headers": {
+     "accpet": "application/json",
+     "Content-Type": "application/json",
+     "Locale": "en_US"
+   },
+   "body": {
+     "id": 10,
+     "title": "string",
+     "price": 0.0,
+     "descripion": "string",
+     "category": "string"
+   }
+}
+
+Output EXACTLY 5 tests as a JSON array [ ... ]:
+[
+  {
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accpet": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 10,
+      "title": "string",
+      "price": 0.0,
+      "descripion": "string",
+      "category": "string"
+    }
+  },
+  ...
+]
+
+=== EXTRACTED JSON ===
+[ ... ]
+
+=== ERROR ===
+Expecting value: line 1 column 3 (char 2)

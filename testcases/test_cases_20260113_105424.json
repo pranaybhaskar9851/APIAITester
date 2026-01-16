@@ -1,0 +1,330 @@
+[
+  {
+    "id": "test001",
+    "test_name": "GET /carts/1 - GET",
+    "method": "GET",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "POST /carts - POST (Valid Request 1)",
+    "method": "POST",
+    "endpoint": "/carts",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "userId": 1,
+      "products": [
+        {
+          "productId": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /carts - POST (Valid Request 2)",
+    "method": "POST",
+    "endpoint": "/carts",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "userId": 2,
+      "products": [
+        {
+          "productId": 2
+        }
+      ]
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /carts - POST (Invalid Body)",
+    "method": "POST",
+    "endpoint": "/carts",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "PUT /carts/1 - PUT (Valid Request 1)",
+    "method": "PUT",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": [
+        {
+          "productId": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "PUT /carts/999999 - PUT (Invalid ID)",
+    "method": "PUT",
+    "endpoint": "/carts/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 1,
+      "userId": 2,
+      "products": [
+        {
+          "productId": 3
+        }
+      ]
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "PATCH /carts/1 - PATCH (Valid Request 1)",
+    "method": "PATCH",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 1,
+      "userId": 3,
+      "products": [
+        {
+          "productId": 4
+        }
+      ]
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "GET /users - GET",
+    "method": "GET",
+    "endpoint": "/users",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test009",
+    "test_name": "GET /users - Unauthorized",
+    "method": "GET",
+    "endpoint": "/users",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test010",
+    "test_name": "POST /users - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/users",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 10,
+      "username": "testuser",
+      "email": "test@example.com",
+      "password": "securepassword"
+    }
+  },
+  {
+    "id": "test011",
+    "test_name": "POST /users - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/users",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 11,
+      "username": "testuser2",
+      "email": "test2@example.com",
+      "password": "securepassword2"
+    }
+  },
+  {
+    "id": "test012",
+    "test_name": "POST /users - Invalid Body",
+    "method": "POST",
+    "endpoint": "/users",
+    "expected_status": 400,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test013",
+    "test_name": "GET /users/1 - GET",
+    "method": "GET",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test014",
+    "test_name": "GET /users/-1 - Unauthorized",
+    "method": "GET",
+    "endpoint": "/users/-1",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test015",
+    "test_name": "PUT /users/1 - Valid Request 1",
+    "method": "PUT",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 10,
+      "username": "stringvalue",
+      "email": "stringvalue@example.com",
+      "password": "stringvalue"
+    }
+  },
+  {
+    "id": "test016",
+    "test_name": "PUT /users/1 - Valid Request 2",
+    "method": "PUT",
+    "endpoint": "/users/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 10,
+      "username": "stringvalue",
+      "email": "stringvalue@example.com",
+      "password": "stringvalue"
+    }
+  },
+  {
+    "id": "test017",
+    "test_name": "PUT /users/-999999 - Invalid ID",
+    "method": "PUT",
+    "endpoint": "/users/-999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "id": 10,
+      "username": "stringvalue",
+      "email": "stringvalue@example.com",
+      "password": "stringvalue"
+    }
+  },
+  {
+    "id": "test018",
+    "test_name": "POST /users - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/users",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "username": "stringvalue",
+      "email": "stringvalue@example.com"
+    }
+  },
+  {
+    "id": "test019",
+    "test_name": "POST /users - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/users",
+    "expected_status": 201,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    },
+    "body": {
+      "username": "stringvalue",
+      "email": "stringvalue@example.com"
+    }
+  }
+]

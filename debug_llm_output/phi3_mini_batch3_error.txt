@@ -1,0 +1,384 @@
+=== ORIGINAL OUTPUT ===
+[
+  {
+    "id": "test001",
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "GET /products - Unauthorized",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /products - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "id": 10,
+      "userId": 10,
+      "products": []
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /products - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "id": 11,
+      "userId": 11,
+      "products": []
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "POST /carts - Invalid Body",
+    "method": "POST",
+    "endpoint": "/carts",
+    "expected_status": 400,
+    "auth": "valid",
+    "body": {}
+  },
+  {
+    "id": "test006",
+    "test_name": "GET /cart - Valid Request with ID",
+    "method": "GET",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid"
+  },
+  {
+    "id": "test007",
+    "test_name": "PUT /products - Valid Request with ID",
+    "method": "PUT",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "PUT /products - Valid Request with ID (different body)",
+    "method": "PUT",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test009",
+    "test_name": "PUT /products - Invalid ID (non-existent)",
+    "method": "PUT",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test010",
+    "test_name": "DELETE /products - Valid Request with ID",
+    "method": "DELETE",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid"
+  },
+  {
+    "id": "test011",
+    "test_name": "DELETE /products - Invalid ID (non-existent)",
+    "method": "DELETE",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid"
+  },
+  {
+    "id": "test012",
+    "test_name": "PATCH /products - Valid Request with ID (different body)",
+    "method": "PATCH",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test013",
+    "test_name": "PATCH /products - Valid Request with ID (different body)",
+    "method": "PATCH",
+sic,
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test014",
+    "test_name": "PATCH /products - Invalid ID (non-existent)",
+    "method": "PATCH",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid"
+  }
+]
+
+=== EXTRACTED JSON ===
+[
+  {
+    "id": "test001",
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "GET /products - Unauthorized",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /products - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "id": 10,
+      "userId": 10,
+      "products": []
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /products - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "id": 11,
+      "userId": 11,
+      "products": []
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "POST /carts - Invalid Body",
+    "method": "POST",
+    "endpoint": "/carts",
+    "expected_status": 400,
+    "auth": "valid",
+    "body": {}
+  },
+  {
+    "id": "test006",
+    "test_name": "GET /cart - Valid Request with ID",
+    "method": "GET",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid"
+  },
+  {
+    "id": "test007",
+    "test_name": "PUT /products - Valid Request with ID",
+    "method": "PUT",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "PUT /products - Valid Request with ID (different body)",
+    "method": "PUT",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test009",
+    "test_name": "PUT /products - Invalid ID (non-existent)",
+    "method": "PUT",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test010",
+    "test_name": "DELETE /products - Valid Request with ID",
+    "method": "DELETE",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid"
+  },
+  {
+    "id": "test011",
+    "test_name": "DELETE /products - Invalid ID (non-existent)",
+    "method": "DELETE",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid"
+  },
+  {
+    "id": "test012",
+    "test_name": "PATCH /products - Valid Request with ID (different body)",
+    "method": "PATCH",
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test013",
+    "test_name": "PATCH /products - Valid Request with ID (different body)",
+    "method": "PATCH",
+sic,
+    "endpoint": "/products/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 1,
+      "userId": 1,
+      "products": ["product1"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  },
+  {
+    "id": "test014",
+    "test_name": "PATCH /products - Invalid ID (non-existent)",
+    "method": "PATCH",
+    "endpoint": "/products/999999",
+    "expected_status": 404,
+    "auth": "valid"
+  }
+]
+
+=== ERROR ===
+Expecting property name enclosed in double quotes: line 167 column 1 (char 3772)

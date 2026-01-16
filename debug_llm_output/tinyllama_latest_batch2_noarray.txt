@@ -1,0 +1,42 @@
+=== ORIGINAL OUTPUT ===
+Here are the test cases for the GET, POST, PUT, DELETE, and PATCH methods in valid JSON arrays format. The endpoint path is specified using the "endpoint" field in each test case.
+
+1. GET /products/{id}
+   - Valid Request 1: status 200, auth="valid", FULL body from examples (e.g., {"id": 1})
+   - Invaliid Body: status 400, auth="valid", body={"error":"invalid input"}
+
+2. POST /products
+   - Valid Request 1: {{id}}→1, status 200, auth="valid", FULL body from examples (e.g., {"title": "string", "price": 0.0, "descripion": "string"})
+   - Invaliid ID: {{id}}→999999, status 404, auth="valid", FULL body from examples (e.g., {"error":"invalid input"})
+
+3. PUT /products/{id}
+   - Valid Request: {{id}}→1, status 200, auth="valid", NO body
+   - Invaliid ID: {{id}}→999999, status 404, auth="valid", NO body
+
+4. DELETE /products/{id}
+   - Valid Request: {{id}}→1, status 200, auth="valid", NO body
+   - Invaliid ID: {{id}}→999999, status 404, auth="valid", NO body
+
+5. PATCH /products/{id}
+   - Valid Request: {{id}}→1, status 200, auth="valid", FULL body from examples (e.g., {"price": 0.1})
+   - Invaliid ID: {{id}}→999999, status 404, auth="valid", NO body
+
+6. GET /products/1
+   - Valid Request 1: status 200, auth="valid", FULL body from examples (e.g., {"title": "string", "price": 0.1})
+   - Invaliid Body: status 400, auth="valid", body={"error":"invalid input"}
+
+7. POST /products/1
+   - Valid Request 1: {{id}}→1, status 200, auth="valid", FULL body from examples (e.g., {"title": "string", "price": 0.1})
+   - Invaliid ID: {{id}}→999999, status 404, auth="valid", NO body
+
+8. PUT /products/1
+   - Valid Request: {{id}}→1, status 200, auth="valid", FULL body from examples (e.g., {"title": "string", "price": 0.1})
+   - Invaliid ID: {{id}}→999999, status 404, auth="valid", NO body
+
+9. DELETE /products/1
+   - Valid Request: {{id}}→1, status 200, auth="valid", FULL body from examples (e.g., {"price": 0.1})
+   - Invaliid ID: {{id}}→999999, status 404, auth="valid", NO body
+
+10. PATCH /products/1
+   - Valid Request: {{id}}→1, status 200, auth="valid", FULL body from examples (e.g., {"price": 0.1})
+   - Invaliid ID: {{id}}→999999, status 404, auth="valid", NO body

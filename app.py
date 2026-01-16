@@ -633,7 +633,12 @@ async def run(
     
     # Track execution timing
     execution_start = time.time()
-    timings = {}
+    timings = {
+        'swagger_load': 0,
+        'test_generation': 0,
+        'test_execution': 0,
+        'report_generation': 0
+    }
     
     print("\n" + "="*70, flush=True)
     print("API TEST EXECUTION PIPELINE STARTED", flush=True)
@@ -733,10 +738,10 @@ async def run(
     print(f"PIPELINE COMPLETED SUCCESSFULLY", flush=True)
     print(f"{'='*70}", flush=True)
     print(f"Total Execution Time: {timings['total_execution']:.2f}s", flush=True)
-    print(f"  • Swagger Load: {timings['swagger_load']:.2f}s", flush=True)
-    print(f"  • Test Generation: {timings['test_generation']:.2f}s", flush=True)
-    print(f"  • Test Execution: {timings['test_execution']:.2f}s", flush=True)
-    print(f"  • Report Generation: {timings['report_generation']:.2f}s", flush=True)
+    print(f"  • Swagger Load: {timings.get('swagger_load', 0):.2f}s", flush=True)
+    print(f"  • Test Generation: {timings.get('test_generation', 0):.2f}s", flush=True)
+    print(f"  • Test Execution: {timings.get('test_execution', 0):.2f}s", flush=True)
+    print(f"  • Report Generation: {timings.get('report_generation', 0):.2f}s", flush=True)
     print(f"{'='*70}\n", flush=True)
 
     return {
@@ -745,9 +750,265 @@ async def run(
         "html_report": f"/reports/report_{run_id}.html",
         "junit_report": f"/reports/junit_{run_id}.xml",
         "total_tests": len(results),
-        "passed": sum(1 for r in results if r.get("status") == "PASS"),
-        "failed": sum(1 for r in results if r.get("status") == "FAIL")
+        "passed": sum(1 for r in results if r.get("passed") == True),
+        "failed": sum(1 for r in results if r.get("passed") == False)
     }
+
+@app.get("/benchmarks")
+async def get_benchmarks_page():
+    """Serve the benchmarks dashboard page"""
+    # Get all benchmark result files from benchmarks folder
+    benchmark_files = []
+    benchmarks_dir = "benchmarks"
+    if os.path.exists(benchmarks_dir):
+        benchmark_files = sorted([f for f in os.listdir(benchmarks_dir) if f.startswith("benchmark_results_") and f.endswith(".json")], reverse=True)
+    
+    # Load the latest benchmark results
+    latest_results = []
+    if benchmark_files:
+        try:
+            with open(os.path.join(benchmarks_dir, benchmark_files[0]), 'r', encoding='utf-8') as f:
+                latest_results = json.load(f)
+        except:
+            pass
+    
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <title>LLM Benchmarks - API AI Tester</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }}
+        .container {{
+            max-width: 1400px;
+            margin: 0 auto;
+        }}
+        .header {{
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }}
+        h1 {{
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }}
+        .subtitle {{
+            color: #666;
+            font-size: 16px;
+        }}
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }}
+        .stat-card {{
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }}
+        .stat-value {{
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }}
+        .stat-label {{
+            color: #666;
+            font-size: 14px;
+        }}
+        .results-table {{
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+        }}
+        th {{
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+        }}
+        td {{
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }}
+        tr:hover {{
+            background: #f8f9fa;
+        }}
+        .status-badge {{
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }}
+        .status-success {{
+            background: #d4edda;
+            color: #155724;
+        }}
+        .status-failed {{
+            background: #f8d7da;
+            color: #721c24;
+        }}
+        .status-timeout {{
+            background: #fff3cd;
+            color: #856404;
+        }}
+        .status-error {{
+            background: #f8d7da;
+            color: #721c24;
+        }}
+        .action-buttons {{
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }}
+        .btn {{
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }}
+        .btn-primary {{
+            background: #667eea;
+            color: white;
+        }}
+        .btn-primary:hover {{
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }}
+        .btn-secondary {{
+            background: #f8f9fa;
+            color: #333;
+        }}
+        .btn-secondary:hover {{
+            background: #e9ecef;
+        }}
+        .chart-container {{
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }}
+        .bar {{
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }}
+        .bar-label {{
+            width: 150px;
+            font-size: 14px;
+            font-weight: 500;
+        }}
+        .bar-visual {{
+            flex: 1;
+            height: 30px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+            position: relative;
+            margin-right: 10px;
+        }}
+        .bar-value {{
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 LLM Benchmarks Dashboard</h1>
+            <p class="subtitle">Performance comparison of different LLM models for API test generation</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{len(latest_results)}</div>
+                <div class="stat-label">Models Tested</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{len([r for r in latest_results if r.get('status') == 'SUCCESS'])}</div>
+                <div class="stat-label">Successful Runs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{len([r for r in latest_results if r.get('status') != 'SUCCESS'])}</div>
+                <div class="stat-label">Failed Runs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{sum(r.get('tests_generated', 0) for r in latest_results if r.get('tests_generated'))}</div>
+                <div class="stat-label">Total Tests Generated</div>
+            </div>
+        </div>
+        
+        {'<div class="chart-container"><h2 style="margin-bottom: 20px;">⏱️ Execution Time Comparison</h2>' + ''.join([f'<div class="bar"><div class="bar-label">{r["model"]}</div><div class="bar-visual" style="width: {min(100, (r["total_time"]/max([x.get("total_time", 1) for x in latest_results]))*100)}%"></div><div class="bar-value">{r["total_time"]:.1f}s</div></div>' for r in sorted([r for r in latest_results if r.get("status") == "SUCCESS"], key=lambda x: x.get("total_time", 9999))]) + '</div>' if latest_results and any(r.get("status") == "SUCCESS" for r in latest_results) else ''}
+        
+        <div class="results-table">
+            <h2 style="margin-bottom: 20px;">📊 Detailed Results</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Status</th>
+                        <th>Time (seconds)</th>
+                        <th>Time (minutes)</th>
+                        <th>Tests Generated</th>
+                        <th>Tests Passed</th>
+                        <th>Tests Failed</th>
+                        <th>Pass Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {''.join([f'''
+                    <tr>
+                        <td><strong>{r["model"]}</strong></td>
+                        <td><span class="status-badge status-{r["status"].lower()}">{r["status"]}</span></td>
+                        <td>{r["total_time"]:.1f}s</td>
+                        <td>{r["total_time"]/60:.1f}m</td>
+                        <td>{r.get("tests_generated", "N/A")}</td>
+                        <td>{r.get("tests_passed", "N/A")}</td>
+                        <td>{r.get("tests_failed", "N/A")}</td>
+                        <td>{f'{(r.get("tests_passed", 0) / r.get("tests_generated", 1) * 100):.1f}%' if r.get("tests_generated") else "N/A"}</td>
+                    </tr>
+                    ''' for r in latest_results]) if latest_results else '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #999;">No benchmark results available. Run benchmark_llms.py to generate results.</td></tr>'}
+                </tbody>
+            </table>
+            
+            <div class="action-buttons">
+                <a href="/" class="btn btn-secondary">← Back to Home</a>
+                <button class="btn btn-primary" onclick="location.reload()">🔄 Refresh Results</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>"""
+    return HTMLResponse(content=html)
 
 @app.get("/reports/{filename}")
 async def get_report(filename: str):

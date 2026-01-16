@@ -1,0 +1,374 @@
+=== ORIGINAL OUTPUT ===
+[
+  {
+    "id": "test001",
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "GET /products - Unauthorized",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /products - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "productName": "Sample Product",
+      "price": 9.99
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /products - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "productName": "Another Product",
+      "price": 14.99
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "POST /products - Invalid Body",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 400,
+    "auth": "valid",
+    "body": {}
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "PUT /carts/1 - Valid Request 1",
+    "method": "PUT",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 10,
+      "userId": 10,
+      "products": []
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "PUT /carts/1 - Valid Request 2",
+    "method": "PUT",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 10,
+      "userId": 10,
+      "products": ["Product A"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "PUT /carts/1 - Invalid ID",
+    "method": "PUT",
+    "endpoint": "/carts/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "body": {
+      "id": 10,
+      "userId": 10,
+      "products": ["Product A"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test009",
+    "test_name": "DELETE /carts/1 - Valid Request",
+    "method": "DELETE",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": ""
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test100",
+    "test_name": "DELETE /carts/999999 - Invalid ID",
+    "method": "DELETE",
+    "endpoint": "/carts/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "body": ""
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test101",
+    "test_name": "GET /carts/1 - Valid Request",
+    "method": "GET",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test102",
+    "test_name": "GET /carts/999999 - Invalid ID",
+    "method": "GET",
+    "endpoint": "/carts/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  }
+]
+
+=== EXTRACTED JSON ===
+[
+  {
+    "id": "test001",
+    "test_name": "GET /products - Valid Request",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test002",
+    "test_name": "GET /products - Unauthorized",
+    "method": "GET",
+    "endpoint": "/products",
+    "expected_status": 200,
+    "auth": "invalid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test003",
+    "test_name": "POST /products - Valid Request 1",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "productName": "Sample Product",
+      "price": 9.99
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test004",
+    "test_name": "POST /products - Valid Request 2",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 201,
+    "auth": "valid",
+    "body": {
+      "productName": "Another Product",
+      "price": 14.99
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test005",
+    "test_name": "POST /products - Invalid Body",
+    "method": "POST",
+    "endpoint": "/products",
+    "expected_status": 400,
+    "auth": "valid",
+    "body": {}
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test006",
+    "test_name": "PUT /carts/1 - Valid Request 1",
+    "method": "PUT",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 10,
+      "userId": 10,
+      "products": []
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test007",
+    "test_name": "PUT /carts/1 - Valid Request 2",
+    "method": "PUT",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": {
+      "id": 10,
+      "userId": 10,
+      "products": ["Product A"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test008",
+    "test_name": "PUT /carts/1 - Invalid ID",
+    "method": "PUT",
+    "endpoint": "/carts/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "body": {
+      "id": 10,
+      "userId": 10,
+      "products": ["Product A"]
+    },
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test009",
+    "test_name": "DELETE /carts/1 - Valid Request",
+    "method": "DELETE",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "body": ""
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test100",
+    "test_name": "DELETE /carts/999999 - Invalid ID",
+    "method": "DELETE",
+    "endpoint": "/carts/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "body": ""
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test101",
+    "test_name": "GET /carts/1 - Valid Request",
+    "method": "GET",
+    "endpoint": "/carts/1",
+    "expected_status": 200,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  },
+  {
+    "id": "test102",
+    "test_name": "GET /carts/999999 - Invalid ID",
+    "method": "GET",
+    "endpoint": "/carts/999999",
+    "expected_status": 404,
+    "auth": "valid",
+    "headers": {
+      "accept": "application/json",
+      "Content-Type": "application/json",
+      "Locale": "en_US"
+    }
+  }
+]
+
+=== ERROR ===
+Expecting ',' delimiter: line 70 column 5 (char 1583)

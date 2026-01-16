@@ -8,8 +8,8 @@ from datetime import datetime
 
 # Configuration
 BASE_API_URL = "http://127.0.0.1:8000"
-SWAGGER_URL = "https://petstore3.swagger.io/api/v3/openapi.json"
-BASE_URL = "https://petstore3.swagger.io/api/v3"
+SWAGGER_URL = "http://127.0.0.1:8000/fakestoreapi_swagger.json"
+BASE_URL = "https://fakestoreapi.com"
 API_KEY = "test-api-key"
 
 # Models to test
@@ -137,8 +137,10 @@ def main():
             print(f"{i}. {result['model']:<25} {result['total_time']:>6.1f}s ({result['total_time']/60:.1f} min)")
     
     # Save results to file
+    import os
+    os.makedirs("benchmarks", exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    results_file = f"benchmark_results_{timestamp}.json"
+    results_file = os.path.join("benchmarks", f"benchmark_results_{timestamp}.json")
     with open(results_file, 'w') as f:
         json.dump(results, f, indent=2)
     print(f"\nDetailed results saved to: {results_file}")
